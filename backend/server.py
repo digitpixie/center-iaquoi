@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
-from passlib.context import CryptikContext
+from passlib.context import CryptContext
 import jwt
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
@@ -29,7 +29,7 @@ app.add_middleware(
 
 # Security
 security = HTTPBearer()
-pwd_context = CryptikContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
