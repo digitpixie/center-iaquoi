@@ -180,8 +180,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Integrate La méthode SMART tool"
-    - "Backend CRUD operations for tools"
     - "Display tools in dashboard"
     - "Tool fullscreen view"
   stuck_tasks: []
