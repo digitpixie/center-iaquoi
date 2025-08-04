@@ -40,7 +40,6 @@ function App() {
   useEffect(() => {
     if (user) {
       fetchTools();
-      fetchCategories();
     }
   }, [user]);
 
