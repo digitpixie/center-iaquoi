@@ -391,13 +391,10 @@ function App() {
                 )}
                 
                 <div className="p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-white text-sm line-clamp-2 flex-1">
+                  <div>
+                    <h3 className="font-semibold text-white text-sm line-clamp-2">
                       {tool.title}
                     </h3>
-                    <Badge variant="secondary" className="ml-2 bg-gray-800 text-gray-300 border-0">
-                      <span className="text-xs">{tool.category}</span>
-                    </Badge>
                   </div>
                   
                   <p className="text-xs text-gray-400 line-clamp-2">
@@ -408,28 +405,20 @@ function App() {
                     <Button
                       size="sm"
                       onClick={() => openToolFullscreen(tool)}
-                      className="w-full bg-white text-black hover:bg-gray-200 text-xs"
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 text-xs font-medium shadow-lg"
                     >
                       <Maximize2 className="w-3 h-3 mr-2" />
-                      Ouvrir l'outil
+                      ✨ Découvrir
                     </Button>
-                    <div className="flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openEditDialog(tool)}
-                        className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 text-xs"
-                      >
-                        <Edit className="w-3 h-3 mr-1" />
-                        Modifier
-                      </Button>
+                    <div className="flex justify-center">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleDeleteTool(tool.id)}
                         className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Supprimer
                       </Button>
                     </div>
                   </div>
