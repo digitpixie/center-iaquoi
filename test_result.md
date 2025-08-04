@@ -120,6 +120,18 @@ backend:
           agent: "testing"
           comment: "VERIFIED: SMART tool integration fully working. Authentication successful with admin@digitpixie.com. Tool found in GET /api/tools with correct ID (adcffb0c-a0de-4c7a-af74-78e95609746b), title (La méthode SMART), category (Formation IA), and HTML content. All CRUD operations working. Categories endpoint includes Formation IA category. All 7 tests passed."
 
+  - task: "Integrate Diagnostic créateur IA tool"
+    implemented: true
+    working: true
+    file: "/app/integrate_diagnostic_tool.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Successfully created tool via API - Tool ID: 45f4eb99-862d-4123-ad16-63ab5d3b8845, Title: Diagnostic créateur IA, Category: Diagnostic. This is a comprehensive 20-question interactive quiz with 5 AI creator archetypes (Explorateur, Stratège, Artiste, Perfectionniste, Pragmatique). Platform now has 3 total tools."
+
   - task: "Backend authentication system"
     implemented: true
     working: true
