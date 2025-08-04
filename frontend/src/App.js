@@ -172,7 +172,6 @@ function App() {
       if (response.ok) {
         setSuccess('Outil supprimé!');
         fetchTools();
-        fetchCategories();
       } else {
         setError('Erreur lors de la suppression');
       }
