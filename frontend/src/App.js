@@ -201,15 +201,7 @@ function App() {
 
 
 
-  const getCategoryIcon = (category) => {
-    switch (category.toLowerCase()) {
-      case 'calculateur': return <Calculator className="w-4 h-4" />;
-      case 'analyse': return <BarChart3 className="w-4 h-4" />;
-      case 'formation': return <BookOpen className="w-4 h-4" />;
-      case 'formation ia': return <BookOpen className="w-4 h-4" />;
-      default: return <Wrench className="w-4 h-4" />;
-    }
-  };
+
 
   if (isLoading) {
     return (
