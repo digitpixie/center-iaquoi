@@ -374,38 +374,12 @@ function App() {
           </Alert>
         )}
 
-        {/* Category Tabs */}
-        <div className="mb-8">
-          <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 bg-gray-900 border-gray-800">
-              <TabsTrigger 
-                value="all" 
-                className="text-gray-300 data-[state=active]:bg-white data-[state=active]:text-black"
-              >
-                Tous ({tools.length})
-              </TabsTrigger>
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category.name}
-                  value={category.name}
-                  className="text-gray-300 data-[state=active]:bg-white data-[state=active]:text-black flex items-center space-x-1"
-                >
-                  {getCategoryIcon(category.name)}
-                  <span className="hidden sm:inline">{category.name}</span>
-                  <span className="sm:hidden">({category.count})</span>
-                  <span className="hidden sm:inline">({category.count})</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-
         {/* Tools Grid */}
-        {filteredTools.length === 0 ? (
+        {tools.length === 0 ? (
           <div className="text-center py-16">
             <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-400 mb-2">
-              {selectedCategory === 'all' ? 'Aucun outil pour le moment' : `Aucun outil dans "${selectedCategory}"`}
+              Aucun outil pour le moment
             </h3>
             <p className="text-gray-500 mb-4">
               Aucun outil disponible pour le moment
@@ -413,7 +387,7 @@ function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredTools.map((tool) => (
+            {tools.map((tool) => (
               <Card key={tool.id} className="tool-card group bg-gray-900 border-gray-800 overflow-hidden">
                 {tool.preview_image && (
                   <div className="aspect-[5/3] overflow-hidden">
