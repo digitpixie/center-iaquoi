@@ -485,7 +485,7 @@ function App() {
         {/* Tools Grid */}
         {filteredTools.length === 0 ? (
           <div className="text-center py-12">
-            <Tool className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+            <Wrench className="w-16 h-16 text-slate-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-600 mb-2">
               {selectedCategory === 'all' ? 'Aucun outil pour le moment' : `Aucun outil dans "${selectedCategory}"`}
             </h3>
