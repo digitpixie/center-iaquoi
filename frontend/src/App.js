@@ -294,7 +294,7 @@ function App() {
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-8 bg-gray-900/80 backdrop-blur-sm border-gray-800 shadow-2xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Outils Interactifs</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">IA QUOI</h1>
             <p className="text-gray-400">Accédez à votre collection d'outils</p>
           </div>
 
