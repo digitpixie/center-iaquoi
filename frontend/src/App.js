@@ -200,9 +200,7 @@ function App() {
     setViewingTool(null);
   };
 
-  const filteredTools = selectedCategory === 'all' 
-    ? tools 
-    : tools.filter(tool => tool.category === selectedCategory);
+
 
   const getCategoryIcon = (category) => {
     switch (category.toLowerCase()) {
