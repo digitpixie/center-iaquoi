@@ -1,75 +1,304 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
-import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+import asyncio
+from typing import Optional, List, Dict, Any
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from fastapi import FastAPI, HTTPException, Depends, status, UploadFile, File
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
+from passlib.context import CryptikContext
+import jwt
+from motor.motor_asyncio import AsyncIOMotorClient
+import logging
 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+app = FastAPI(title="Outils Interactifs Platform", version="1.0.0")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
-
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Security
+security = HTTPBearer()
+pwd_context = CryptikContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+# Database
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+client = AsyncIOMotorClient(MONGO_URL)
+db = client.outils_interactifs
+
+# Collections
+users_collection = db.users
+tools_collection = db.tools
+
+# Pydantic models
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+    name: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class User(BaseModel):
+    id: str
+    email: str
+    name: str
+    created_at: datetime
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class ToolCreate(BaseModel):
+    title: str
+    description: str
+    category: str
+    html_content: str
+    preview_image: Optional[str] = None
+
+class Tool(BaseModel):
+    id: str
+    title: str
+    description: str
+    category: str
+    html_content: str
+    preview_image: Optional[str] = None
+    user_id: str
+    created_at: datetime
+    updated_at: datetime
+
+# Helper functions
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+    except jwt.PyJWTError:
+        raise credentials_exception
+    
+    user = await users_collection.find_one({"id": user_id})
+    if user is None:
+        raise credentials_exception
+    return user
+
+# API Routes
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
+
+@app.post("/api/auth/register", response_model=Token)
+async def register(user: UserCreate):
+    # Check if user already exists
+    existing_user = await users_collection.find_one({"email": user.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create new user
+    user_id = str(uuid.uuid4())
+    hashed_password = get_password_hash(user.password)
+    
+    user_doc = {
+        "id": user_id,
+        "email": user.email,
+        "name": user.name,
+        "hashed_password": hashed_password,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    await users_collection.insert_one(user_doc)
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user_id}, expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/api/auth/login", response_model=Token)
+async def login(user: UserLogin):
+    db_user = await users_collection.find_one({"email": user.email})
+    if not db_user or not verify_password(user.password, db_user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password"
+        )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": db_user["id"]}, expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/api/auth/me", response_model=User)
+async def get_current_user_info(current_user = Depends(get_current_user)):
+    return User(
+        id=current_user["id"],
+        email=current_user["email"],
+        name=current_user["name"],
+        created_at=current_user["created_at"]
+    )
+
+@app.get("/api/tools", response_model=List[Tool])
+async def get_tools(current_user = Depends(get_current_user)):
+    tools = []
+    cursor = tools_collection.find({"user_id": current_user["id"]}).sort("created_at", -1)
+    async for tool in cursor:
+        tools.append(Tool(
+            id=tool["id"],
+            title=tool["title"],
+            description=tool["description"],
+            category=tool["category"],
+            html_content=tool["html_content"],
+            preview_image=tool.get("preview_image"),
+            user_id=tool["user_id"],
+            created_at=tool["created_at"],
+            updated_at=tool["updated_at"]
+        ))
+    return tools
+
+@app.post("/api/tools", response_model=Tool)
+async def create_tool(tool: ToolCreate, current_user = Depends(get_current_user)):
+    tool_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc)
+    
+    tool_doc = {
+        "id": tool_id,
+        "title": tool.title,
+        "description": tool.description,
+        "category": tool.category,
+        "html_content": tool.html_content,
+        "preview_image": tool.preview_image,
+        "user_id": current_user["id"],
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await tools_collection.insert_one(tool_doc)
+    
+    return Tool(**tool_doc)
+
+@app.get("/api/tools/{tool_id}", response_model=Tool)
+async def get_tool(tool_id: str, current_user = Depends(get_current_user)):
+    tool = await tools_collection.find_one({
+        "id": tool_id,
+        "user_id": current_user["id"]
+    })
+    
+    if not tool:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tool not found"
+        )
+    
+    return Tool(**tool)
+
+@app.put("/api/tools/{tool_id}", response_model=Tool)
+async def update_tool(tool_id: str, tool_update: ToolCreate, current_user = Depends(get_current_user)):
+    existing_tool = await tools_collection.find_one({
+        "id": tool_id,
+        "user_id": current_user["id"]
+    })
+    
+    if not existing_tool:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tool not found"
+        )
+    
+    update_doc = {
+        "title": tool_update.title,
+        "description": tool_update.description,
+        "category": tool_update.category,
+        "html_content": tool_update.html_content,
+        "preview_image": tool_update.preview_image,
+        "updated_at": datetime.now(timezone.utc)
+    }
+    
+    await tools_collection.update_one(
+        {"id": tool_id, "user_id": current_user["id"]},
+        {"$set": update_doc}
+    )
+    
+    updated_tool = await tools_collection.find_one({
+        "id": tool_id,
+        "user_id": current_user["id"]
+    })
+    
+    return Tool(**updated_tool)
+
+@app.delete("/api/tools/{tool_id}")
+async def delete_tool(tool_id: str, current_user = Depends(get_current_user)):
+    result = await tools_collection.delete_one({
+        "id": tool_id,
+        "user_id": current_user["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tool not found"
+        )
+    
+    return {"message": "Tool deleted successfully"}
+
+@app.get("/api/categories")
+async def get_categories(current_user = Depends(get_current_user)):
+    pipeline = [
+        {"$match": {"user_id": current_user["id"]}},
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    
+    categories = []
+    async for category in tools_collection.aggregate(pipeline):
+        categories.append({
+            "name": category["_id"],
+            "count": category["count"]
+        })
+    
+    return categories
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
