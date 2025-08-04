@@ -395,8 +395,7 @@ function App() {
                     <h3 className="font-semibold text-white text-sm line-clamp-2 flex-1">
                       {tool.title}
                     </h3>
-                    <Badge variant="secondary" className="ml-2 bg-gray-800 text-gray-300 border-0 flex items-center space-x-1 shrink-0">
-                      {getCategoryIcon(tool.category)}
+                    <Badge variant="secondary" className="ml-2 bg-gray-800 text-gray-300 border-0">
                       <span className="text-xs">{tool.category}</span>
                     </Badge>
                   </div>
