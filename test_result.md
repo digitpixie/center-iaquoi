@@ -120,17 +120,17 @@ backend:
           agent: "testing"
           comment: "VERIFIED: SMART tool integration fully working. Authentication successful with admin@digitpixie.com. Tool found in GET /api/tools with correct ID (adcffb0c-a0de-4c7a-af74-78e95609746b), title (La méthode SMART), category (Formation IA), and HTML content. All CRUD operations working. Categories endpoint includes Formation IA category. All 7 tests passed."
 
-  - task: "Integrate Diagnostic créateur IA tool"
+  - task: "Integrate Les 3 cerveaux IA tool"
     implemented: true
     working: true
-    file: "/app/integrate_diagnostic_tool.py"
+    file: "/app/integrate_3cerveaux_tool.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "main"
-          comment: "Successfully created tool via API - Tool ID: 45f4eb99-862d-4123-ad16-63ab5d3b8845, Title: Diagnostic créateur IA, Category: Diagnostic. This is a comprehensive 20-question interactive quiz with 5 AI creator archetypes (Explorateur, Stratège, Artiste, Perfectionniste, Pragmatique). Platform now has 3 total tools."
+          comment: "Successfully created tool via API - Tool ID: 6199f747-8e88-434b-a64a-c77377dc7568, Title: Les 3 cerveaux IA, Category: Formation IA. This is a comprehensive AI training module covering ChatGPT, Claude, GenSpark with P.R.O.M.P.T. method. Platform now has 4 total tools."
         - working: true
           agent: "testing"
           comment: "VERIFIED: Diagnostic tool integration fully successful. All 7 tests passed. Authentication working with admin@digitpixie.com. Platform now has exactly 3 tools: Avatar Command Center 2.0, La méthode SMART, and Diagnostic créateur IA. Diagnostic tool found with correct ID (45f4eb99-862d-4123-ad16-63ab5d3b8845), title, category (Diagnostic), and 61,928 characters of HTML content containing quiz elements. Categories endpoint includes both Formation IA (2 tools) and Diagnostic (1 tool) categories. All CRUD operations working. Tool retrieval, specific tool access, and update operations all functional."
