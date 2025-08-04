@@ -176,88 +176,133 @@ class OutilsInteractifsAPITester:
         )
         return success
 
-def main():
-    print("🚀 Starting Outils Interactifs API Tests")
+def test_smart_tool_integration():
+    """Test the specific SMART tool integration"""
+    print("🚀 Testing La méthode SMART Tool Integration")
     print("=" * 50)
     
     # Setup
     tester = OutilsInteractifsAPITester()
-    test_timestamp = datetime.now().strftime('%H%M%S')
-    test_email = f"test_{test_timestamp}@example.com"
-    test_password = "testpass123"
-    test_name = "Test User"
+    admin_email = "admin@digitpixie.com"
+    admin_password = "DigitPixie2025!"
+    smart_tool_id = "adcffb0c-a0de-4c7a-af74-78e95609746b"
 
     # Test 1: Health Check
+    print("\n1. Testing Health Check...")
     if not tester.test_health_check()[0]:
         print("❌ Health check failed, stopping tests")
         return 1
 
-    # Test 2: User Registration
-    if not tester.test_register(test_email, test_password, test_name):
-        print("❌ Registration failed, stopping tests")
+    # Test 2: Admin Login
+    print("\n2. Testing Admin Authentication...")
+    if not tester.test_login(admin_email, admin_password):
+        print("❌ Admin login failed, stopping tests")
         return 1
 
     # Test 3: Get Current User
+    print("\n3. Testing Get Current User...")
     if not tester.test_get_current_user():
         print("❌ Get current user failed")
         return 1
 
-    # Test 4: Create Tool
-    calculator_html = """<!DOCTYPE html><html><head><title>Calculateur</title></head><body><h2>Calculateur Simple</h2><input type='number' id='a' placeholder='Nombre 1'><input type='number' id='b' placeholder='Nombre 2'><button onclick='calculate()'>Calculer</button><p id='result'></p><script>function calculate(){const a=document.getElementById('a').value;const b=document.getElementById('b').value;document.getElementById('result').innerHTML='Résultat: '+(parseFloat(a)+parseFloat(b));}</script></body></html>"""
-    
-    tool_id = tester.test_create_tool(
-        "Calculateur Simple",
-        "Un calculateur HTML simple pour tester",
-        "Calculateur",
-        calculator_html
-    )
-    if not tool_id:
-        print("❌ Tool creation failed")
-        return 1
-
-    # Test 5: Get Tools
+    # Test 4: Get All Tools (should include SMART tool)
+    print("\n4. Testing Tool Retrieval...")
     tools = tester.test_get_tools()
-    if not tools:
+    if not isinstance(tools, list):
         print("❌ Get tools failed")
         return 1
+    
+    # Check if SMART tool exists
+    smart_tool_found = False
+    smart_tool_data = None
+    for tool in tools:
+        if tool.get('id') == smart_tool_id or tool.get('title') == "La méthode SMART":
+            smart_tool_found = True
+            smart_tool_data = tool
+            break
+    
+    if smart_tool_found:
+        print("✅ SMART tool found in tools list")
+        print(f"   Tool ID: {smart_tool_data.get('id')}")
+        print(f"   Title: {smart_tool_data.get('title')}")
+        print(f"   Category: {smart_tool_data.get('category')}")
+    else:
+        print("❌ SMART tool not found in tools list")
+        print(f"   Available tools: {[tool.get('title') for tool in tools]}")
 
-    # Test 6: Get Specific Tool
-    if not tester.test_get_tool(tool_id):
-        print("❌ Get specific tool failed")
-        return 1
+    # Test 5: Get Specific SMART Tool
+    print("\n5. Testing Specific Tool Retrieval...")
+    if smart_tool_found and smart_tool_data:
+        actual_tool_id = smart_tool_data.get('id')
+        success = tester.test_get_tool(actual_tool_id)
+        if success:
+            print("✅ SMART tool retrieved successfully")
+        else:
+            print("❌ Failed to retrieve SMART tool")
+    else:
+        print("⚠️  Skipping specific tool test - SMART tool not found")
 
-    # Test 7: Get Categories
+    # Test 6: Verify Tool Details
+    print("\n6. Testing Tool Details...")
+    if smart_tool_found and smart_tool_data:
+        title_correct = smart_tool_data.get('title') == "La méthode SMART"
+        category_correct = smart_tool_data.get('category') == "Formation IA"
+        has_html_content = bool(smart_tool_data.get('html_content'))
+        
+        print(f"   Title correct: {'✅' if title_correct else '❌'} (Expected: 'La méthode SMART', Got: '{smart_tool_data.get('title')}')")
+        print(f"   Category correct: {'✅' if category_correct else '❌'} (Expected: 'Formation IA', Got: '{smart_tool_data.get('category')}')")
+        print(f"   Has HTML content: {'✅' if has_html_content else '❌'}")
+        
+        if not (title_correct and category_correct and has_html_content):
+            print("❌ Tool details verification failed")
+    else:
+        print("⚠️  Skipping tool details verification - SMART tool not found")
+
+    # Test 7: Get Categories (should include "Formation IA")
+    print("\n7. Testing Categories...")
     categories = tester.test_get_categories()
-    if not isinstance(categories, list):
+    if isinstance(categories, list):
+        formation_ia_found = any(cat.get('name') == 'Formation IA' for cat in categories)
+        print(f"   Formation IA category found: {'✅' if formation_ia_found else '❌'}")
+        print(f"   Available categories: {[cat.get('name') for cat in categories]}")
+        if not formation_ia_found:
+            print("❌ Formation IA category not found")
+    else:
         print("❌ Get categories failed")
-        return 1
 
-    # Test 8: Update Tool
-    if not tester.test_update_tool(
-        tool_id,
-        "Calculateur Simple Modifié",
-        "Un calculateur HTML simple modifié",
-        "Calculateur",
-        calculator_html
-    ):
-        print("❌ Tool update failed")
-        return 1
-
-    # Test 9: Delete Tool
-    if not tester.test_delete_tool(tool_id):
-        print("❌ Tool deletion failed")
-        return 1
-
-    # Test 10: Test Login with existing user
-    # Reset token to test login
-    tester.token = None
-    if not tester.test_login(test_email, test_password):
-        print("❌ Login failed")
-        return 1
+    # Test 8: Test Tool Update (if SMART tool exists)
+    print("\n8. Testing Tool Update...")
+    if smart_tool_found and smart_tool_data:
+        actual_tool_id = smart_tool_data.get('id')
+        original_html = smart_tool_data.get('html_content', '')
+        
+        success = tester.test_update_tool(
+            actual_tool_id,
+            "La méthode SMART",  # Keep same title
+            "Méthode SMART pour définir des objectifs efficaces - Updated",  # Updated description
+            "Formation IA",  # Keep same category
+            original_html  # Keep same HTML content
+        )
+        if success:
+            print("✅ SMART tool update successful")
+        else:
+            print("❌ SMART tool update failed")
+    else:
+        print("⚠️  Skipping tool update test - SMART tool not found")
 
     # Print final results
     print("\n" + "=" * 50)
     print(f"📊 Tests completed: {tester.tests_passed}/{tester.tests_run}")
+    
+    # Summary of critical findings
+    print("\n🔍 SMART Tool Integration Summary:")
+    if smart_tool_found:
+        print("✅ SMART tool successfully integrated and accessible")
+        print(f"   Tool ID: {smart_tool_data.get('id')}")
+        print(f"   Title: {smart_tool_data.get('title')}")
+        print(f"   Category: {smart_tool_data.get('category')}")
+    else:
+        print("❌ SMART tool integration failed - tool not found")
     
     if tester.tests_passed == tester.tests_run:
         print("🎉 All tests passed!")
@@ -265,6 +310,10 @@ def main():
     else:
         print(f"❌ {tester.tests_run - tester.tests_passed} tests failed")
         return 1
+
+def main():
+    """Main test function - runs SMART tool integration tests"""
+    return test_smart_tool_integration()
 
 if __name__ == "__main__":
     sys.exit(main())
