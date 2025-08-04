@@ -138,7 +138,7 @@ class OutilsInteractifsAPITester:
             f"api/tools/{tool_id}",
             200
         )
-        return success
+        return success, response if success else {}
 
     def test_update_tool(self, tool_id, title, description, category, html_content):
         """Test tool update"""
@@ -176,16 +176,17 @@ class OutilsInteractifsAPITester:
         )
         return success
 
-def test_smart_tool_integration():
-    """Test the specific SMART tool integration"""
-    print("🚀 Testing La méthode SMART Tool Integration")
-    print("=" * 50)
+def test_3cerveaux_tool_integration():
+    """Test the specific Les 3 cerveaux IA tool integration"""
+    print("🚀 Testing Les 3 cerveaux IA Tool Integration")
+    print("=" * 60)
     
     # Setup
     tester = OutilsInteractifsAPITester()
     admin_email = "admin@digitpixie.com"
     admin_password = "DigitPixie2025!"
-    smart_tool_id = "adcffb0c-a0de-4c7a-af74-78e95609746b"
+    cerveaux_tool_id = "6199f747-8e88-434b-a64a-c77377dc7568"
+    expected_tools_count = 4  # Should have 4 tools total now
 
     # Test 1: Health Check
     print("\n1. Testing Health Check...")
@@ -205,115 +206,178 @@ def test_smart_tool_integration():
         print("❌ Get current user failed")
         return 1
 
-    # Test 4: Get All Tools (should include SMART tool)
+    # Test 4: Get All Tools (should include Les 3 cerveaux IA tool and be 4 total)
     print("\n4. Testing Tool Retrieval...")
     tools = tester.test_get_tools()
     if not isinstance(tools, list):
         print("❌ Get tools failed")
         return 1
     
-    # Check if SMART tool exists
-    smart_tool_found = False
-    smart_tool_data = None
+    print(f"   Total tools found: {len(tools)}")
+    print(f"   Expected tools count: {expected_tools_count}")
+    
+    # Check if Les 3 cerveaux IA tool exists
+    cerveaux_tool_found = False
+    cerveaux_tool_data = None
+    all_tool_titles = []
+    
     for tool in tools:
-        if tool.get('id') == smart_tool_id or tool.get('title') == "La méthode SMART":
-            smart_tool_found = True
-            smart_tool_data = tool
+        all_tool_titles.append(tool.get('title', 'Unknown'))
+        if tool.get('id') == cerveaux_tool_id or tool.get('title') == "Les 3 cerveaux IA":
+            cerveaux_tool_found = True
+            cerveaux_tool_data = tool
             break
     
-    if smart_tool_found:
-        print("✅ SMART tool found in tools list")
-        print(f"   Tool ID: {smart_tool_data.get('id')}")
-        print(f"   Title: {smart_tool_data.get('title')}")
-        print(f"   Category: {smart_tool_data.get('category')}")
+    print(f"   Available tools: {all_tool_titles}")
+    
+    if cerveaux_tool_found:
+        print("✅ Les 3 cerveaux IA tool found in tools list")
+        print(f"   Tool ID: {cerveaux_tool_data.get('id')}")
+        print(f"   Title: {cerveaux_tool_data.get('title')}")
+        print(f"   Category: {cerveaux_tool_data.get('category')}")
     else:
-        print("❌ SMART tool not found in tools list")
-        print(f"   Available tools: {[tool.get('title') for tool in tools]}")
+        print("❌ Les 3 cerveaux IA tool not found in tools list")
+    
+    # Verify total tools count
+    if len(tools) == expected_tools_count:
+        print(f"✅ Correct number of tools ({expected_tools_count})")
+    else:
+        print(f"❌ Incorrect number of tools - Expected: {expected_tools_count}, Got: {len(tools)}")
 
-    # Test 5: Get Specific SMART Tool
+    # Test 5: Get Specific Les 3 cerveaux IA Tool
     print("\n5. Testing Specific Tool Retrieval...")
-    if smart_tool_found and smart_tool_data:
-        actual_tool_id = smart_tool_data.get('id')
-        success = tester.test_get_tool(actual_tool_id)
+    if cerveaux_tool_found and cerveaux_tool_data:
+        actual_tool_id = cerveaux_tool_data.get('id')
+        success, tool_details = tester.test_get_tool(actual_tool_id)
         if success:
-            print("✅ SMART tool retrieved successfully")
+            print("✅ Les 3 cerveaux IA tool retrieved successfully")
+            print(f"   HTML content length: {len(tool_details.get('html_content', ''))}")
         else:
-            print("❌ Failed to retrieve SMART tool")
+            print("❌ Failed to retrieve Les 3 cerveaux IA tool")
     else:
-        print("⚠️  Skipping specific tool test - SMART tool not found")
+        print("⚠️  Skipping specific tool test - Les 3 cerveaux IA tool not found")
 
     # Test 6: Verify Tool Details
     print("\n6. Testing Tool Details...")
-    if smart_tool_found and smart_tool_data:
-        title_correct = smart_tool_data.get('title') == "La méthode SMART"
-        category_correct = smart_tool_data.get('category') == "Formation IA"
-        has_html_content = bool(smart_tool_data.get('html_content'))
+    if cerveaux_tool_found and cerveaux_tool_data:
+        title_correct = cerveaux_tool_data.get('title') == "Les 3 cerveaux IA"
+        category_correct = cerveaux_tool_data.get('category') == "Formation IA"
+        has_html_content = bool(cerveaux_tool_data.get('html_content'))
+        id_correct = cerveaux_tool_data.get('id') == cerveaux_tool_id
         
-        print(f"   Title correct: {'✅' if title_correct else '❌'} (Expected: 'La méthode SMART', Got: '{smart_tool_data.get('title')}')")
-        print(f"   Category correct: {'✅' if category_correct else '❌'} (Expected: 'Formation IA', Got: '{smart_tool_data.get('category')}')")
+        print(f"   Title correct: {'✅' if title_correct else '❌'} (Expected: 'Les 3 cerveaux IA', Got: '{cerveaux_tool_data.get('title')}')")
+        print(f"   Category correct: {'✅' if category_correct else '❌'} (Expected: 'Formation IA', Got: '{cerveaux_tool_data.get('category')}')")
+        print(f"   ID correct: {'✅' if id_correct else '❌'} (Expected: '{cerveaux_tool_id}', Got: '{cerveaux_tool_data.get('id')}')")
         print(f"   Has HTML content: {'✅' if has_html_content else '❌'}")
         
-        if not (title_correct and category_correct and has_html_content):
+        if has_html_content:
+            html_length = len(cerveaux_tool_data.get('html_content', ''))
+            print(f"   HTML content length: {html_length} characters")
+        
+        if not (title_correct and category_correct and has_html_content and id_correct):
             print("❌ Tool details verification failed")
     else:
-        print("⚠️  Skipping tool details verification - SMART tool not found")
+        print("⚠️  Skipping tool details verification - Les 3 cerveaux IA tool not found")
 
-    # Test 7: Get Categories (should include "Formation IA")
+    # Test 7: Get Categories (should include "Formation IA" and "Diagnostic")
     print("\n7. Testing Categories...")
     categories = tester.test_get_categories()
     if isinstance(categories, list):
         formation_ia_found = any(cat.get('name') == 'Formation IA' for cat in categories)
+        diagnostic_found = any(cat.get('name') == 'Diagnostic' for cat in categories)
+        
         print(f"   Formation IA category found: {'✅' if formation_ia_found else '❌'}")
+        print(f"   Diagnostic category found: {'✅' if diagnostic_found else '❌'}")
         print(f"   Available categories: {[cat.get('name') for cat in categories]}")
-        if not formation_ia_found:
-            print("❌ Formation IA category not found")
+        
+        # Check Formation IA count (should be 3 tools now)
+        formation_ia_count = 0
+        diagnostic_count = 0
+        for cat in categories:
+            if cat.get('name') == 'Formation IA':
+                formation_ia_count = cat.get('count', 0)
+            elif cat.get('name') == 'Diagnostic':
+                diagnostic_count = cat.get('count', 0)
+        
+        print(f"   Formation IA tools count: {formation_ia_count} (Expected: 3)")
+        print(f"   Diagnostic tools count: {diagnostic_count} (Expected: 1)")
+        
+        if not (formation_ia_found and diagnostic_found):
+            print("❌ Required categories not found")
     else:
         print("❌ Get categories failed")
 
-    # Test 8: Test Tool Update (if SMART tool exists)
+    # Test 8: Test Tool Update (if Les 3 cerveaux IA tool exists)
     print("\n8. Testing Tool Update...")
-    if smart_tool_found and smart_tool_data:
-        actual_tool_id = smart_tool_data.get('id')
-        original_html = smart_tool_data.get('html_content', '')
+    if cerveaux_tool_found and cerveaux_tool_data:
+        actual_tool_id = cerveaux_tool_data.get('id')
+        original_html = cerveaux_tool_data.get('html_content', '')
         
         success = tester.test_update_tool(
             actual_tool_id,
-            "La méthode SMART",  # Keep same title
-            "Méthode SMART pour définir des objectifs efficaces - Updated",  # Updated description
+            "Les 3 cerveaux IA",  # Keep same title
+            "Formation complète sur les 3 cerveaux IA avec méthode P.R.O.M.P.T. - Updated",  # Updated description
             "Formation IA",  # Keep same category
             original_html  # Keep same HTML content
         )
         if success:
-            print("✅ SMART tool update successful")
+            print("✅ Les 3 cerveaux IA tool update successful")
         else:
-            print("❌ SMART tool update failed")
+            print("❌ Les 3 cerveaux IA tool update failed")
     else:
-        print("⚠️  Skipping tool update test - SMART tool not found")
+        print("⚠️  Skipping tool update test - Les 3 cerveaux IA tool not found")
+
+    # Test 9: Verify Platform Status (4 tools total with correct distribution)
+    print("\n9. Testing Platform Status...")
+    expected_tool_names = [
+        "Avatar Command Center 2.0",
+        "La méthode SMART", 
+        "Diagnostic créateur IA",
+        "Les 3 cerveaux IA"
+    ]
+    
+    found_tools = [tool.get('title') for tool in tools]
+    all_expected_found = all(tool_name in found_tools for tool_name in expected_tool_names)
+    
+    print(f"   Expected tools: {expected_tool_names}")
+    print(f"   Found tools: {found_tools}")
+    print(f"   All expected tools found: {'✅' if all_expected_found else '❌'}")
+    
+    if len(tools) == 4 and all_expected_found:
+        print("✅ Platform status correct - 4 tools with proper distribution")
+    else:
+        print("❌ Platform status incorrect")
 
     # Print final results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     print(f"📊 Tests completed: {tester.tests_passed}/{tester.tests_run}")
     
     # Summary of critical findings
-    print("\n🔍 SMART Tool Integration Summary:")
-    if smart_tool_found:
-        print("✅ SMART tool successfully integrated and accessible")
-        print(f"   Tool ID: {smart_tool_data.get('id')}")
-        print(f"   Title: {smart_tool_data.get('title')}")
-        print(f"   Category: {smart_tool_data.get('category')}")
+    print("\n🔍 Les 3 cerveaux IA Tool Integration Summary:")
+    if cerveaux_tool_found:
+        print("✅ Les 3 cerveaux IA tool successfully integrated and accessible")
+        print(f"   Tool ID: {cerveaux_tool_data.get('id')}")
+        print(f"   Title: {cerveaux_tool_data.get('title')}")
+        print(f"   Category: {cerveaux_tool_data.get('category')}")
+        print(f"   HTML content: {len(cerveaux_tool_data.get('html_content', ''))} characters")
     else:
-        print("❌ SMART tool integration failed - tool not found")
+        print("❌ Les 3 cerveaux IA tool integration failed - tool not found")
+    
+    print(f"\n🏢 Platform Status:")
+    print(f"   Total tools: {len(tools)}/4")
+    print(f"   Authentication: {'✅ Working' if tester.token else '❌ Failed'}")
+    print(f"   CRUD operations: {'✅ Working' if tester.tests_passed > 5 else '❌ Issues detected'}")
     
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed!")
+        print("\n🎉 All tests passed!")
         return 0
     else:
-        print(f"❌ {tester.tests_run - tester.tests_passed} tests failed")
+        print(f"\n❌ {tester.tests_run - tester.tests_passed} tests failed")
         return 1
 
 def main():
-    """Main test function - runs SMART tool integration tests"""
-    return test_smart_tool_integration()
+    """Main test function - runs Les 3 cerveaux IA tool integration tests"""
+    return test_3cerveaux_tool_integration()
 
 if __name__ == "__main__":
     sys.exit(main())
