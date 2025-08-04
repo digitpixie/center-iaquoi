@@ -28,6 +28,8 @@ function App() {
     html_content: '',
     preview_image: ''
   });
+  const [viewingTool, setViewingTool] = useState(null);
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
