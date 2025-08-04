@@ -203,7 +203,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Integrate Diagnostic créateur IA tool"
+    - "Display tools in dashboard"
+    - "Tool fullscreen view"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
