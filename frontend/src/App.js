@@ -79,20 +79,7 @@ function App() {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/categories`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const categoriesData = await response.json();
-        setCategories(categoriesData);
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
+
 
   const handleAuth = async (e) => {
     e.preventDefault();
