@@ -452,7 +452,7 @@ function App() {
             {filteredTools.map((tool) => (
               <Card key={tool.id} className="tool-card group bg-gray-900 border-gray-800 overflow-hidden">
                 {tool.preview_image && (
-                  <div className="aspect-[9/16] sm:aspect-[4/5] overflow-hidden">
+                  <div className="aspect-[5/3] overflow-hidden">
                     <img
                       src={tool.preview_image}
                       alt={tool.title}
