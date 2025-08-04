@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from './components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Alert, AlertDescription } from './components/ui/alert';
-import { Eye, Plus, Edit, Trash2, BookOpen, Tool, Calculator, BarChart3, User, LogOut } from 'lucide-react';
+import { Eye, Plus, Edit, Trash2, BookOpen, Wrench, Calculator, BarChart3, User, LogOut } from 'lucide-react';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
