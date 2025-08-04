@@ -17,8 +17,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
   const [toolFormData, setToolFormData] = useState({
