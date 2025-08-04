@@ -3,7 +3,7 @@ import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
 import { Label } from './components/ui/label';
 import { Card } from './components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Textarea } from './components/ui/textarea';
 import { Badge } from './components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
@@ -28,8 +28,9 @@ function App() {
     html_content: '',
     preview_image: ''
   });
-  const [viewingTool, setViewingTool] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingTool, setEditingTool] = useState(null);
+  const [viewingTool, setViewingTool] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -144,13 +145,8 @@ function App() {
 
     try {
       const token = localStorage.getItem('token');
-      const method = editingTool ? 'PUT' : 'POST';
-      const url = editingTool 
-        ? `${API_URL}/api/tools/${editingTool.id}`
-        : `${API_URL}/api/tools`;
-
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`${API_URL}/api/tools/${editingTool.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -159,10 +155,10 @@ function App() {
       });
 
       if (response.ok) {
-        setSuccess(editingTool ? 'Outil mis à jour!' : 'Outil créé!');
+        setSuccess('Outil mis à jour!');
         fetchTools();
         fetchCategories();
-        setIsToolDialogOpen(false);
+        setIsEditDialogOpen(false);
         setEditingTool(null);
         setToolFormData({
           title: '',
@@ -202,27 +198,16 @@ function App() {
     }
   };
 
-  const openToolDialog = (tool = null) => {
-    if (tool) {
-      setEditingTool(tool);
-      setToolFormData({
-        title: tool.title,
-        description: tool.description,
-        category: tool.category,
-        html_content: tool.html_content,
-        preview_image: tool.preview_image || ''
-      });
-    } else {
-      setEditingTool(null);
-      setToolFormData({
-        title: '',
-        description: '',
-        category: '',
-        html_content: '',
-        preview_image: ''
-      });
-    }
-    setIsToolDialogOpen(true);
+  const openEditDialog = (tool) => {
+    setEditingTool(tool);
+    setToolFormData({
+      title: tool.title,
+      description: tool.description,
+      category: tool.category,
+      html_content: tool.html_content,
+      preview_image: tool.preview_image || ''
+    });
+    setIsEditDialogOpen(true);
   };
 
   const openToolFullscreen = (tool) => {
@@ -435,7 +420,7 @@ function App() {
           </Tabs>
         </div>
 
-        {/* Tools Grid - Instagram/TikTok Style */}
+        {/* Tools Grid */}
         {filteredTools.length === 0 ? (
           <div className="text-center py-16">
             <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -488,7 +473,7 @@ function App() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => openToolDialog(tool)}
+                        onClick={() => openEditDialog(tool)}
                         className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800 text-xs"
                       >
                         <Edit className="w-3 h-3 mr-1" />
@@ -510,6 +495,89 @@ function App() {
           </div>
         )}
       </main>
+
+      {/* Edit Tool Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Modifier l'outil</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleToolSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-gray-300">Titre</Label>
+              <Input
+                id="title"
+                value={toolFormData.title}
+                onChange={(e) => setToolFormData({...toolFormData, title: e.target.value})}
+                required
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-gray-300">Description</Label>
+              <Textarea
+                id="description"
+                value={toolFormData.description}
+                onChange={(e) => setToolFormData({...toolFormData, description: e.target.value})}
+                required
+                rows={3}
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="category" className="text-gray-300">Catégorie</Label>
+              <Input
+                id="category"
+                value={toolFormData.category}
+                onChange={(e) => setToolFormData({...toolFormData, category: e.target.value})}
+                placeholder="ex: Calculateur, Analyse, Formation..."
+                required
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="preview_image" className="text-gray-300">Image d'aperçu (URL)</Label>
+              <Input
+                id="preview_image"
+                value={toolFormData.preview_image}
+                onChange={(e) => setToolFormData({...toolFormData, preview_image: e.target.value})}
+                placeholder="https://example.com/image.jpg"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="html_content" className="text-gray-300">Code HTML</Label>
+              <Textarea
+                id="html_content"
+                value={toolFormData.html_content}
+                onChange={(e) => setToolFormData({...toolFormData, html_content: e.target.value})}
+                required
+                rows={10}
+                className="font-mono text-sm bg-gray-800 border-gray-700 text-white"
+                placeholder="Collez votre code HTML interactif ici..."
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsEditDialogOpen(false)}
+                className="border-gray-700 text-gray-300 hover:bg-gray-800"
+              >
+                Annuler
+              </Button>
+              <Button type="submit" className="bg-white text-black hover:bg-gray-200">
+                Mettre à jour
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

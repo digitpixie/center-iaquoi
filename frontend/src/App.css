@@ -59,7 +59,7 @@ body {
   }
 }
 
-/* Tool Cards - Instagram/TikTok Style */
+/* Tool Cards - Optimized height with 5:3 aspect ratio */
 .tool-card {
   background: rgba(17, 24, 39, 0.8) !important;
   border: 1px solid rgba(55, 65, 81, 0.3) !important;
@@ -91,17 +91,17 @@ body {
   overflow: hidden;
 }
 
-/* Aspect ratio utilities */
+/* Aspect ratio utilities - Optimized for less height */
 .aspect-video {
   aspect-ratio: 16 / 9;
 }
 
-.aspect-\[9\/16\] {
-  aspect-ratio: 9 / 16;
+.aspect-\[5\/3\] {
+  aspect-ratio: 5 / 3; /* Much shorter than 4/5 or 9/16 */
 }
 
-.aspect-\[4\/5\] {
-  aspect-ratio: 4 / 5;
+.aspect-\[4\/3\] {
+  aspect-ratio: 4 / 3;
 }
 
 /* Custom scrollbar */
@@ -145,9 +145,9 @@ body {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
   
-  /* Make cards more vertical on mobile */
-  .tool-card .aspect-\[9\/16\] {
-    aspect-ratio: 3 / 4;
+  /* Even shorter on mobile for better content visibility */
+  .tool-card .aspect-\[5\/3\] {
+    aspect-ratio: 3 / 2;
   }
 }
 
