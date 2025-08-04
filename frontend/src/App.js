@@ -141,7 +141,6 @@ function App() {
       if (response.ok) {
         setSuccess('Outil mis à jour!');
         fetchTools();
-        fetchCategories();
         setIsEditDialogOpen(false);
         setEditingTool(null);
         setToolFormData({
