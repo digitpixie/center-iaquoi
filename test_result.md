@@ -166,7 +166,7 @@ frontend:
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -174,6 +174,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "VERIFIED: Dashboard tool display fully working. Successfully logged in with admin@digitpixie.com. 'La méthode SMART' tool card found in dashboard with correct title and 'Formation IA' category badge. Tool appears in both 'Tous' and 'Formation IA' category filters. Tools grid displays properly with 2 total tools. All dashboard functionality working as expected."
+        - working: "NA"
+          agent: "main"
+          comment: "Frontend should now display the third tool 'Diagnostic créateur IA' in the dashboard with new 'Diagnostic' category - needs testing to verify 3 tools total display correctly"
 
   - task: "Tool fullscreen view"
     implemented: true
@@ -181,7 +184,7 @@ frontend:
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -189,6 +192,9 @@ frontend:
         - working: true
           agent: "testing"
           comment: "VERIFIED: Tool fullscreen view fully functional. 'Ouvrir l'outil' button opens SMART tool in fullscreen with proper navigation header, back button, and tool title. HTML content loads correctly in iframe with 8 interactive form elements. Successfully tested form interaction. Back navigation works perfectly. Repeated navigation tested and working. Minor: Category badge not visible in fullscreen header but core functionality works."
+        - working: "NA"
+          agent: "main"
+          comment: "Tool fullscreen functionality should work with new Diagnostic tool - needs testing to verify the interactive 20-question quiz works properly in fullscreen mode"
 
 metadata:
   created_by: "main_agent"
