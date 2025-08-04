@@ -119,7 +119,6 @@ function App() {
     localStorage.removeItem('token');
     setUser(null);
     setTools([]);
-    setCategories([]);
     setViewingTool(null);
   };
 
