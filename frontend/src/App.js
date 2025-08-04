@@ -444,15 +444,8 @@ function App() {
               {selectedCategory === 'all' ? 'Aucun outil pour le moment' : `Aucun outil dans "${selectedCategory}"`}
             </h3>
             <p className="text-gray-500 mb-4">
-              Commencez par ajouter votre premier outil interactif
+              Aucun outil disponible pour le moment
             </p>
-            <Button 
-              onClick={() => openToolDialog()}
-              className="bg-white text-black hover:bg-gray-200"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Ajouter un outil
-            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
