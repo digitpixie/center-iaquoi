@@ -1084,29 +1084,146 @@
             
             switch(animation) {
                 case 'eat':
-                    // Animation de manger - pet grandit temporairement
-                    petBody.scale.set(1.2, 1.2, 1.2);
+                    // Animation de manger - pet grandit + particules orange
+                    petBody.scale.set(1.3, 1.3, 1.3);
+                    // Effet de mâcher
+                    const chewAnimation = setInterval(() => {
+                        petBody.scale.set(1.2, 1.4, 1.2);
+                        setTimeout(() => petBody.scale.set(1.3, 1.3, 1.3), 200);
+                    }, 400);
+                    setTimeout(() => clearInterval(chewAnimation), 1200);
+                    
+                    // Particules de nourriture
+                    createFoodParticles();
                     break;
+                    
                 case 'happy':
-                    // Animation de joie - saut
-                    petGroup.position.y = 0.3;
-                    petGroup.rotation.z = Math.sin(Date.now() * 0.01) * 0.2;
+                    // Animation de joie - saut énergique + rotation + cœurs
+                    let jumpCount = 0;
+                    const jumpInterval = setInterval(() => {
+                        petGroup.position.y = 0.5 + Math.sin(jumpCount * 0.5) * 0.3;
+                        petGroup.rotation.y += 0.2;
+                        jumpCount++;
+                        if (jumpCount > 10) clearInterval(jumpInterval);
+                    }, 100);
+                    
+                    // Particules en forme de cœur
+                    createHeartParticles();
                     break;
+                    
                 case 'sleep':
-                    // Animation de sommeil - rotation lente
-                    petGroup.rotation.z = 0.3;
-                    petBody.material.opacity = 0.7;
+                    // Animation de sommeil - s'allonge doucement + ronflement
+                    petGroup.rotation.z = 0.5; // Se penche
+                    petBody.material.opacity = 0.6;
+                    
+                    // Animation de respiration lente
+                    let sleepBreath = 0;
+                    const sleepInterval = setInterval(() => {
+                        const breathScale = 1 + Math.sin(sleepBreath * 0.3) * 0.1;
+                        petBody.scale.set(breathScale, breathScale, breathScale);
+                        sleepBreath++;
+                    }, 150);
+                    setTimeout(() => clearInterval(sleepInterval), 1800);
+                    
+                    // Particules "Z Z Z" de sommeil
+                    createSleepParticles();
                     break;
+                    
                 case 'learn':
-                    // Animation d'apprentissage - rotation plus rapide
-                    petGroup.rotation.y += 0.05;
+                    // Animation d'apprentissage - rotation + grossissement tête + éclairs
+                    petGroup.rotation.y += 0.1;
+                    
+                    // Effet "cerveau qui grandit"
+                    leftEye.scale.set(1.2, 1.2, 1.2);
+                    rightEye.scale.set(1.2, 1.2, 1.2);
+                    
+                    // Animation de pulsation intelligente
+                    let learnPulse = 0;
+                    const learnInterval = setInterval(() => {
+                        const scale = 1 + Math.sin(learnPulse * 0.8) * 0.15;
+                        petBody.scale.set(scale, scale * 1.1, scale); // Tête plus grosse
+                        learnPulse++;
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(learnInterval);
+                        leftEye.scale.set(1, 1, 1);
+                        rightEye.scale.set(1, 1, 1);
+                    }, 2500);
+                    
+                    // Particules d'éclairs de génie
+                    createLightningParticles();
                     break;
+                    
                 default:
-                    // Animation idle - retour normal
+                    // Animation idle - retour normal en douceur
                     petGroup.position.y = 0;
                     petGroup.rotation.z = 0;
                     petBody.material.opacity = 0.9;
                     petBody.scale.set(1, 1, 1);
+            }
+        }
+
+        // Nouvelles fonctions pour les particules spécifiques
+        function createFoodParticles() {
+            const food = ['🍕', '🍔', '🍟', '🌭', '🥪'];
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const foodEmoji = food[Math.floor(Math.random() * food.length)];
+                    createFloatingEmoji(foodEmoji, 0xff6b35);
+                }, i * 200);
+            }
+        }
+
+        function createHeartParticles() {
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    createFloatingEmoji('💖', 0xff69b4);
+                }, i * 150);
+            }
+        }
+
+        function createSleepParticles() {
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    const sleepSymbols = ['💤', '😴', 'Z'];
+                    const symbol = sleepSymbols[Math.floor(Math.random() * sleepSymbols.length)];
+                    createFloatingEmoji(symbol, 0xdda0dd);
+                }, i * 300);
+            }
+        }
+
+        function createLightningParticles() {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const symbols = ['⚡', '💡', '🧠', '✨', '🌟'];
+                    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    createFloatingEmoji(symbol, 0xffd700);
+                }, i * 100);
+            }
+        }
+
+        function createFloatingEmoji(emoji, color) {
+            // Cette fonction créerait des sprites 3D avec les emojis
+            // Pour la simplicité, on va juste ajouter des particules colorées qui montent
+            if (particleSystem) {
+                const positions = particleSystem.geometry.attributes.position.array;
+                const colors = particleSystem.geometry.attributes.color.array;
+                
+                // Modifier quelques particules existantes pour l'effet
+                for (let i = 0; i < 15; i++) {
+                    const index = Math.floor(Math.random() * (positions.length / 3)) * 3;
+                    positions[index] = (Math.random() - 0.5) * 2; // X
+                    positions[index + 1] = -2; // Y (démarre en bas)
+                    positions[index + 2] = (Math.random() - 0.5) * 2; // Z
+                    
+                    // Couleur spécifique
+                    const c = new THREE.Color(color);
+                    colors[index] = c.r;
+                    colors[index + 1] = c.g;
+                    colors[index + 2] = c.b;
+                }
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+                particleSystem.geometry.attributes.color.needsUpdate = true;
             }
         }
 
