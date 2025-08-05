@@ -197,6 +197,208 @@ class OutilsInteractifsAPITester:
         )
         return success, response if success else {}
 
+def test_pet_state_management():
+    """Test the PIXEL-IA Buddy pet state management endpoints"""
+    print("🚀 Testing PIXEL-IA Buddy Pet State Management")
+    print("=" * 60)
+    
+    # Setup
+    tester = OutilsInteractifsAPITester()
+    admin_email = "admin@digitpixie.com"
+    admin_password = "DigitPixie2025!"
+
+    # Test 1: Health Check
+    print("\n1. Testing Health Check...")
+    if not tester.test_health_check()[0]:
+        print("❌ Health check failed, stopping tests")
+        return 1
+
+    # Test 2: Admin Login
+    print("\n2. Testing Admin Authentication...")
+    if not tester.test_login(admin_email, admin_password):
+        print("❌ Admin login failed, stopping tests")
+        return 1
+
+    # Test 3: Get Current User
+    print("\n3. Testing Get Current User...")
+    if not tester.test_get_current_user():
+        print("❌ Get current user failed")
+        return 1
+
+    # Test 4: Get Pet State (should create default if none exists)
+    print("\n4. Testing Get Pet State (Default Creation)...")
+    success, pet_state = tester.test_get_pet_state()
+    if not success:
+        print("❌ Get pet state failed")
+        return 1
+    
+    # Verify default pet state values
+    expected_defaults = {
+        "name": "PIXEL-IA",
+        "level": 1,
+        "happiness": 80,
+        "knowledge": 60,
+        "energy": 75,
+        "hunger": 70,
+        "stage": "baby",
+        "modules_completed": 0,
+        "mood": "happy"
+    }
+    
+    print("   Verifying default pet state values:")
+    defaults_correct = True
+    for key, expected_value in expected_defaults.items():
+        actual_value = pet_state.get(key)
+        is_correct = actual_value == expected_value
+        defaults_correct = defaults_correct and is_correct
+        print(f"   {key}: {'✅' if is_correct else '❌'} (Expected: {expected_value}, Got: {actual_value})")
+    
+    if defaults_correct:
+        print("✅ Default pet state values are correct")
+    else:
+        print("❌ Some default pet state values are incorrect")
+    
+    # Verify required fields exist
+    required_fields = ["id", "user_id", "created_at", "updated_at"]
+    for field in required_fields:
+        if field in pet_state:
+            print(f"   {field}: ✅ Present")
+        else:
+            print(f"   {field}: ❌ Missing")
+            defaults_correct = False
+
+    # Test 5: Update Pet State
+    print("\n5. Testing Pet State Update...")
+    updated_pet_data = {
+        "name": "PIXEL-IA Buddy",
+        "level": 2,
+        "happiness": 90,
+        "knowledge": 75,
+        "energy": 85,
+        "hunger": 60,
+        "stage": "child",
+        "modules_completed": 3,
+        "mood": "excited"
+    }
+    
+    success, updated_pet = tester.test_save_pet_state(updated_pet_data)
+    if not success:
+        print("❌ Pet state update failed")
+        return 1
+    
+    # Verify updated values
+    print("   Verifying updated pet state values:")
+    update_correct = True
+    for key, expected_value in updated_pet_data.items():
+        actual_value = updated_pet.get(key)
+        is_correct = actual_value == expected_value
+        update_correct = update_correct and is_correct
+        print(f"   {key}: {'✅' if is_correct else '❌'} (Expected: {expected_value}, Got: {actual_value})")
+    
+    if update_correct:
+        print("✅ Pet state update successful")
+    else:
+        print("❌ Pet state update values incorrect")
+
+    # Test 6: Data Persistence - Get Pet State Again
+    print("\n6. Testing Data Persistence...")
+    success, persisted_pet = tester.test_get_pet_state()
+    if not success:
+        print("❌ Get pet state after update failed")
+        return 1
+    
+    # Verify persistence
+    print("   Verifying persisted pet state values:")
+    persistence_correct = True
+    for key, expected_value in updated_pet_data.items():
+        actual_value = persisted_pet.get(key)
+        is_correct = actual_value == expected_value
+        persistence_correct = persistence_correct and is_correct
+        print(f"   {key}: {'✅' if is_correct else '❌'} (Expected: {expected_value}, Got: {actual_value})")
+    
+    if persistence_correct:
+        print("✅ Pet state persistence working correctly")
+    else:
+        print("❌ Pet state persistence failed")
+
+    # Test 7: Per-User Isolation (Create second user to test isolation)
+    print("\n7. Testing Per-User Isolation...")
+    
+    # Create a second user for isolation testing
+    test_user_email = "testuser@digitpixie.com"
+    test_user_password = "TestUser2025!"
+    test_user_name = "Test User"
+    
+    # Create second tester instance
+    tester2 = OutilsInteractifsAPITester()
+    
+    # Try to register second user (might already exist, that's ok)
+    print("   Attempting to register second test user...")
+    register_success = tester2.test_register(test_user_email, test_user_password, test_user_name)
+    if not register_success:
+        # If registration fails, try login instead
+        print("   Registration failed, attempting login...")
+        if not tester2.test_login(test_user_email, test_user_password):
+            print("   ⚠️  Could not create/login second user, skipping isolation test")
+            print("   This is not critical - isolation test requires a second user account")
+        else:
+            print("   ✅ Second user login successful")
+    else:
+        print("   ✅ Second user registration successful")
+    
+    if tester2.token:
+        # Get pet state for second user (should create new default)
+        success, second_user_pet = tester2.test_get_pet_state()
+        if success:
+            # Verify second user gets default values, not the updated values from first user
+            isolation_correct = True
+            for key, expected_default in expected_defaults.items():
+                actual_value = second_user_pet.get(key)
+                is_default = actual_value == expected_default
+                isolation_correct = isolation_correct and is_default
+                print(f"   Second user {key}: {'✅' if is_default else '❌'} (Expected default: {expected_default}, Got: {actual_value})")
+            
+            # Verify different user_id
+            first_user_id = persisted_pet.get("user_id")
+            second_user_id = second_user_pet.get("user_id")
+            different_user_ids = first_user_id != second_user_id
+            print(f"   Different user IDs: {'✅' if different_user_ids else '❌'} (User1: {first_user_id}, User2: {second_user_id})")
+            
+            if isolation_correct and different_user_ids:
+                print("✅ Per-user isolation working correctly")
+            else:
+                print("❌ Per-user isolation failed")
+        else:
+            print("❌ Could not get pet state for second user")
+    else:
+        print("   ⚠️  Skipping isolation test - second user authentication failed")
+
+    # Print final results
+    print("\n" + "=" * 60)
+    print(f"📊 Tests completed: {tester.tests_passed}/{tester.tests_run}")
+    
+    # Summary of critical findings
+    print("\n🔍 Pet State Management Summary:")
+    print(f"   Authentication: {'✅ Working' if tester.token else '❌ Failed'}")
+    print(f"   Default pet state creation: {'✅ Working' if defaults_correct else '❌ Failed'}")
+    print(f"   Pet state updates: {'✅ Working' if update_correct else '❌ Failed'}")
+    print(f"   Data persistence: {'✅ Working' if persistence_correct else '❌ Failed'}")
+    
+    if tester2.token:
+        print(f"   Per-user isolation: {'✅ Working' if 'isolation_correct' in locals() and isolation_correct else '❌ Failed'}")
+    else:
+        print(f"   Per-user isolation: ⚠️  Not tested (second user unavailable)")
+    
+    # Determine overall success
+    critical_tests_passed = defaults_correct and update_correct and persistence_correct
+    
+    if critical_tests_passed:
+        print("\n🎉 All critical pet state management tests passed!")
+        return 0
+    else:
+        print(f"\n❌ Some critical pet state management tests failed")
+        return 1
+
 def test_3cerveaux_tool_integration():
     """Test the specific Les 3 cerveaux IA tool integration"""
     print("🚀 Testing Les 3 cerveaux IA Tool Integration")
