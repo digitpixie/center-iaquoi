@@ -847,10 +847,10 @@
             // Group pour le pet
             petGroup = new THREE.Group();
 
-            // Corps du pet (cube arrondi)
+            // Corps du pet (cube arrondi) - Couleurs plus chaudes
             const bodyGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, 8, 8, 8);
             const bodyMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0x06b6d4,
+                color: 0xff6b6b,  // Rouge-rose chaleureux au lieu du cyan froid
                 transparent: true,
                 opacity: 0.9,
                 shininess: 100
