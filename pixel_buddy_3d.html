@@ -928,14 +928,14 @@
                 positions[i * 3 + 1] = (Math.random() - 0.5) * 8;
                 positions[i * 3 + 2] = (Math.random() - 0.5) * 8;
 
-                // Couleurs selon l'humeur
+                // Couleurs chaudes selon l'humeur
                 const color = new THREE.Color();
                 if (pet.mood === 'happy') {
-                    color.setRGB(0.02, 0.71, 0.83); // Cyan
+                    color.setRGB(1.0, 0.7, 0.2); // Doré chaud
                 } else if (pet.mood === 'excited') {
-                    color.setRGB(0.66, 0.33, 0.97); // Violet
+                    color.setRGB(1.0, 0.4, 0.7); // Rose vif
                 } else {
-                    color.setRGB(0.5, 0.5, 0.5); // Gris
+                    color.setRGB(0.9, 0.6, 0.3); // Orange doux
                 }
                 
                 colors[i * 3] = color.r;
