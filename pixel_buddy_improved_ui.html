@@ -86,10 +86,10 @@
         .screen {
             background: #000;
             border-radius: 2.5rem;
-            height: 600px; /* Fixed height for main screen */
+            height: min(600px, 80vh); /* Responsive height */
             overflow: hidden;
             position: relative;
-            /* Removed the white/cyan glow that created the border around the screen */
+            /* Completely removed any shadows or borders that could create white lines */
         }
 
         .screen-content {
