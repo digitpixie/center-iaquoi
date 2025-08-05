@@ -900,14 +900,19 @@
 
             scene.add(petGroup);
 
-            // Éclairage
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+            // Éclairage chaleureux
+            const ambientLight = new THREE.AmbientLight(0xffeaa7, 0.6); // Lumière ambiante dorée
             scene.add(ambientLight);
 
-            const pointLight = new THREE.PointLight(0x06b6d4, 1, 100);
-            pointLight.position.set(0, 3, 3);
+            const pointLight = new THREE.PointLight(0xffb347, 1.2, 100); // Lumière orange chaleureuse
+            pointLight.position.set(2, 4, 3);
             pointLight.castShadow = true;
             scene.add(pointLight);
+
+            // Lumière d'appoint rose pour plus de chaleur
+            const pinkLight = new THREE.PointLight(0xff69b4, 0.8, 50);
+            pinkLight.position.set(-2, 2, 2);
+            scene.add(pinkLight);
 
             // Events souris
             canvas.addEventListener('mousemove', onMouseMove);
