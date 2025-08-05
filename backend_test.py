@@ -176,6 +176,27 @@ class OutilsInteractifsAPITester:
         )
         return success
 
+    def test_get_pet_state(self):
+        """Test get pet state (creates default if none exists)"""
+        success, response = self.run_test(
+            "Get Pet State",
+            "GET",
+            "api/pet-state",
+            200
+        )
+        return success, response if success else {}
+
+    def test_save_pet_state(self, pet_data):
+        """Test save/update pet state"""
+        success, response = self.run_test(
+            "Save Pet State",
+            "POST",
+            "api/pet-state",
+            200,
+            data=pet_data
+        )
+        return success, response if success else {}
+
 def test_3cerveaux_tool_integration():
     """Test the specific Les 3 cerveaux IA tool integration"""
     print("🚀 Testing Les 3 cerveaux IA Tool Integration")
