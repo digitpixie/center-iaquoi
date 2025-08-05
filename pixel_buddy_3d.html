@@ -1018,24 +1018,24 @@
                 particleSystem.geometry.attributes.position.needsUpdate = true;
             }
 
-            // Couleur selon l'humeur
+            // Couleur chaude selon l'humeur
             if (petBody) {
                 let color;
                 switch(pet.mood) {
                     case 'happy':
-                        color = 0x06b6d4; // Cyan
+                        color = 0xffb347; // Orange doré chaleureux
                         break;
                     case 'excited':
-                        color = 0xa855f7; // Violet
+                        color = 0xff69b4; // Rose vif et chaleureux
                         break;
                     case 'sad':
-                        color = 0x4b5563; // Gris
+                        color = 0x9370db; // Violet doux au lieu du gris froid
                         break;
                     case 'sleepy':
-                        color = 0x1e293b; // Gris foncé
+                        color = 0xdda0dd; // Lavande douce
                         break;
                     default:
-                        color = 0x06b6d4;
+                        color = 0xff6b6b; // Rouge-rose par défaut
                 }
                 petBody.material.color.setHex(color);
             }
