@@ -42,6 +42,7 @@ db = client.outils_interactifs
 # Collections
 users_collection = db.users
 tools_collection = db.tools
+pet_states_collection = db.pet_states
 
 # Pydantic models
 class UserCreate(BaseModel):
