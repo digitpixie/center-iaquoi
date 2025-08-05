@@ -1131,24 +1131,24 @@
                 particleSystem.geometry.attributes.position.needsUpdate = true;
             }
 
-            // Couleur chaude selon l'humeur
+            // Couleur douce selon l'humeur (couleurs plus pastel et mignonnes)
             if (petBody) {
                 let color;
                 switch(pet.mood) {
                     case 'happy':
-                        color = 0xffb347; // Orange doré chaleureux
+                        color = 0xffd1dc; // Rose poudré doux
                         break;
                     case 'excited':
-                        color = 0xff69b4; // Rose vif et chaleureux
+                        color = 0xffb6c1; // Rose plus vif mais doux
                         break;
                     case 'sad':
-                        color = 0x9370db; // Violet doux au lieu du gris froid
+                        color = 0xd8bfd8; // Lavande très douce
                         break;
                     case 'sleepy':
-                        color = 0xdda0dd; // Lavande douce
+                        color = 0xf0e68c; // Jaune très pâle et doux
                         break;
                     default:
-                        color = 0xff6b6b; // Rouge-rose par défaut
+                        color = 0xf5deb3; // Beige doux par défaut
                 }
                 petBody.material.color.setHex(color);
             }
