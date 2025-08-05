@@ -903,53 +903,105 @@
             // Group pour le pet
             petGroup = new THREE.Group();
 
-            // Corps du pet (cube arrondi) - Couleurs plus chaudes
-            const bodyGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5, 8, 8, 8);
+            // Corps principal - forme plus douce et arrondie comme dans l'image
+            const bodyGeometry = new THREE.CapsuleGeometry(0.8, 1.2, 4, 16); // Plus doux qu'un cube
             const bodyMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xff6b6b,  // Rouge-rose chaleureux au lieu du cyan froid
+                color: 0xf5deb3,  // Beige doux comme dans l'image
                 transparent: true,
-                opacity: 0.9,
-                shininess: 100
+                opacity: 0.95,
+                shininess: 30,
+                roughness: 0.8 // Texture plus mate/douce
             });
             petBody = new THREE.Mesh(bodyGeometry, bodyMaterial);
             petBody.castShadow = true;
             petGroup.add(petBody);
 
-            // Yeux
-            const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-            const eyeMaterial = new THREE.MeshPhongMaterial({ 
-                color: 0xffffff,
+            // Yeux fermés paisibles (comme dans l'image)
+            const eyeGeometry = new THREE.EllipseGeometry(0.15, 0.08, 16);
+            const eyeMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.25, 0.4, 0.6);
+            leftEye.rotation.z = 0.2; // Légèrement incliné pour effet "fermé"
+            petGroup.add(leftEye);
+
+            rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.25, 0.4, 0.6);
+            rightEye.rotation.z = -0.2;
+            petGroup.add(rightEye);
+
+            // Joues roses brillantes (comme dans l'image)
+            const cheekGeometry = new THREE.SphereGeometry(0.12, 16, 16);
+            const cheekMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xff91a4,  // Rose doux
+                transparent: true,
+                opacity: 0.8,
+                emissive: 0xff91a4,
+                emissiveIntensity: 0.3 // Effet brillant
+            });
+            
+            const leftCheek = new THREE.Mesh(cheekGeometry, cheekMaterial);
+            leftCheek.position.set(-0.35, 0.1, 0.55);
+            petGroup.add(leftCheek);
+
+            const rightCheek = new THREE.Mesh(cheekGeometry, cheekMaterial);
+            rightCheek.position.set(0.35, 0.1, 0.55);
+            petGroup.add(rightCheek);
+
+            // Petites pattes comme dans l'image
+            const legGeometry = new THREE.CylinderGeometry(0.08, 0.12, 0.4, 8);
+            const legMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xdeb887, // Beige plus foncé
                 transparent: true,
                 opacity: 0.9
             });
             
-            leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            leftEye.position.set(-0.3, 0.3, 0.7);
-            petGroup.add(leftEye);
+            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+            leftLeg.position.set(-0.3, -0.8, 0);
+            petGroup.add(leftLeg);
 
-            rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
-            rightEye.position.set(0.3, 0.3, 0.7);
-            petGroup.add(rightEye);
+            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+            rightLeg.position.set(0.3, -0.8, 0);
+            petGroup.add(rightLeg);
 
-            // Pupilles
-            const pupilGeometry = new THREE.SphereGeometry(0.08, 16, 16);
-            const pupilMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            // Petits pieds ronds
+            const footGeometry = new THREE.SphereGeometry(0.12, 8, 8);
+            const footMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xcd853f, // Marron doux
+                transparent: true,
+                opacity: 0.9
+            });
             
-            const leftPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-            leftPupil.position.set(0, 0, 0.1);
-            leftEye.add(leftPupil);
+            const leftFoot = new THREE.Mesh(footGeometry, footMaterial);
+            leftFoot.position.set(-0.3, -1.1, 0.1);
+            petGroup.add(leftFoot);
 
-            const rightPupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-            rightPupil.position.set(0, 0, 0.1);
-            rightEye.add(rightPupil);
+            const rightFoot = new THREE.Mesh(footGeometry, footMaterial);
+            rightFoot.position.set(0.3, -1.1, 0.1);
+            petGroup.add(rightFoot);
 
-            // Bouche
-            const mouthGeometry = new THREE.TorusGeometry(0.2, 0.05, 8, 16, Math.PI);
-            const mouthMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+            // Petite bouche souriante (discrète)
+            const mouthGeometry = new THREE.TorusGeometry(0.1, 0.03, 8, 16, Math.PI);
+            const mouthMaterial = new THREE.MeshPhongMaterial({ color: 0x8b4513 });
             const mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
-            mouth.position.set(0, -0.2, 0.7);
+            mouth.position.set(0, 0, 0.65);
             mouth.rotation.z = Math.PI;
             petGroup.add(mouth);
+
+            // Badge/patch comme dans l'image
+            const badgeGeometry = new THREE.BoxGeometry(0.15, 0.1, 0.02);
+            const badgeMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x8b0000, // Rouge foncé
+                transparent: true,
+                opacity: 0.9
+            });
+            const badge = new THREE.Mesh(badgeGeometry, badgeMaterial);
+            badge.position.set(0, -0.2, 0.65);
+            petGroup.add(badge);
 
             // Particules autour du pet
             createParticleSystem();
