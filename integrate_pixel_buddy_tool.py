@@ -1072,7 +1072,7 @@ PIXEL_BUDDY_HTML = '''<!DOCTYPE html>
 
 def main():
     # Configuration
-    API_URL = "http://localhost:8001"
+    API_URL = "https://4429d075-908e-45f6-a06c-e0daa6dbe403.preview.emergentagent.com"
     
     # User credentials
     login_data = {
