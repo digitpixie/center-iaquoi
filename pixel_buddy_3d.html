@@ -330,17 +330,18 @@
             box-shadow: 0 0 10px #06b6d4;
         }
 
-        /* Action Buttons */
+        /* Action Buttons - Couleurs chaudes et bien visibles */
         .action-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.8); /* Plus opaque pour contraste */
             border-radius: 1rem;
             margin: 15px 0 0 0;
-            z-index: 5;
+            z-index: 15; /* Z-index plus élevé */
             position: relative;
+            border: 2px solid rgba(255, 179, 71, 0.3); /* Bordure dorée visible */
         }
 
         .action-btn {
@@ -348,7 +349,7 @@
             height: 55px;
             border-radius: 1rem;
             background: rgba(0, 0, 0, 0.9);
-            border: 2px solid transparent;
+            border: 3px solid transparent; /* Bordure plus épaisse */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -357,59 +358,89 @@
             font-size: 24px;
             backdrop-filter: blur(10px);
             position: relative;
+            z-index: 16; /* Au-dessus du container */
         }
 
         .action-btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(1.1) translateY(-3px); /* Plus d'effet au survol */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
-        .action-btn-cyan {
-            border-color: #06b6d4;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
-            background: rgba(6, 182, 212, 0.1);
+        /* Bouton NOURRIR - Orange chaleureux */
+        .action-btn-feed {
+            border-color: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.6);
+            background: rgba(255, 107, 53, 0.2);
+            animation: pulse-orange 2s infinite;
         }
 
-        .action-btn-cyan:hover {
-            border-color: #22d3ee;
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.7);
-            background: rgba(6, 182, 212, 0.2);
+        .action-btn-feed:hover {
+            border-color: #ff8c42;
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.8);
+            background: rgba(255, 107, 53, 0.3);
         }
 
-        .action-btn-purple {
-            border-color: #a855f7;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-            background: rgba(168, 85, 247, 0.1);
+        /* Bouton JOUER - Rose vif */
+        .action-btn-play {
+            border-color: #ff69b4;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+            background: rgba(255, 105, 180, 0.2);
+            animation: pulse-pink 2s infinite 0.5s;
         }
 
-        .action-btn-purple:hover {
-            border-color: #c084fc;
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
-            background: rgba(168, 85, 247, 0.2);
+        .action-btn-play:hover {
+            border-color: #ff1493;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.8);
+            background: rgba(255, 105, 180, 0.3);
         }
 
-        .action-btn-blue {
-            border-color: #3b82f6;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-            background: rgba(59, 130, 246, 0.1);
+        /* Bouton REPOS - Lavande doux */
+        .action-btn-rest {
+            border-color: #dda0dd;
+            box-shadow: 0 0 20px rgba(221, 160, 221, 0.6);
+            background: rgba(221, 160, 221, 0.2);
+            animation: pulse-lavender 2s infinite 1s;
         }
 
-        .action-btn-blue:hover {
-            border-color: #60a5fa;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
-            background: rgba(59, 130, 246, 0.2);
+        .action-btn-rest:hover {
+            border-color: #da70d6;
+            box-shadow: 0 0 30px rgba(221, 160, 221, 0.8);
+            background: rgba(221, 160, 221, 0.3);
         }
 
-        .action-btn-pink {
-            border-color: #ec4899;
-            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
-            background: rgba(236, 72, 153, 0.1);
+        /* Bouton APPRENDRE - Doré */
+        .action-btn-learn {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            background: rgba(255, 215, 0, 0.2);
+            animation: pulse-gold 2s infinite 1.5s;
         }
 
-        .action-btn-pink:hover {
-            border-color: #f472b6;
-            box-shadow: 0 0 25px rgba(236, 72, 153, 0.7);
-            background: rgba(236, 72, 153, 0.2);
+        .action-btn-learn:hover {
+            border-color: #ffed4e;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            background: rgba(255, 215, 0, 0.3);
+        }
+
+        /* Animations de pulsation pour chaque bouton */
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.9); }
+        }
+
+        @keyframes pulse-pink {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(255, 105, 180, 0.9); }
+        }
+
+        @keyframes pulse-lavender {
+            0%, 100% { box-shadow: 0 0 20px rgba(221, 160, 221, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(221, 160, 221, 0.9); }
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
         }
 
         /* Button Labels */
