@@ -82,6 +82,32 @@ class Tool(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+class PetStateCreate(BaseModel):
+    name: str = "PIXEL-IA"
+    level: int = 1
+    happiness: int = 80
+    knowledge: int = 60
+    energy: int = 75
+    hunger: int = 70
+    stage: str = "baby"
+    modules_completed: int = 0
+    mood: str = "happy"
+
+class PetState(BaseModel):
+    id: str
+    user_id: str
+    name: str
+    level: int
+    happiness: int
+    knowledge: int
+    energy: int
+    hunger: int
+    stage: str
+    modules_completed: int
+    mood: str
+    created_at: datetime
+    updated_at: datetime
+
 # Helper functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
