@@ -118,7 +118,7 @@ backend:
           comment: "Successfully created PIXEL-IA Buddy tool via API - Tool ID: a4b50aeb-2901-460f-87a1-727930b967cc, Title: PIXEL-IA Buddy, Category: Gaming. Digital pet tamagotchi tool integrated successfully. Platform now has 6 tools total."
 
   - task: "Backend pet state management endpoints"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
@@ -127,7 +127,7 @@ backend:
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "Need to implement POST /api/pet-state and GET /api/pet-state endpoints for per-user pet evolution saving"
+          comment: "Implemented POST /api/pet-state and GET /api/pet-state endpoints for per-user pet evolution saving. Added pet_states_collection, PetState/PetStateCreate models, and backend endpoints with default state creation."
     implemented: true
     working: true
     file: "/app/integrate_smart_tool.py"
