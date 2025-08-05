@@ -42,13 +42,15 @@
             font-family: monospace;
             color: #fff;
             width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
+            max-width: min(450px, 90vw); /* Responsive but no white space */
+            margin: 0;
+            padding: 0;
         }
 
         .tamagotchi-device {
             position: relative;
-            margin: 0 auto;
+            margin: 0;
+            width: 100%;
         }
 
         .device-inner {
