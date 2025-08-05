@@ -599,8 +599,8 @@ def test_3cerveaux_tool_integration():
         return 1
 
 def main():
-    """Main test function - runs Les 3 cerveaux IA tool integration tests"""
-    return test_3cerveaux_tool_integration()
+    """Main test function - runs pet state management tests"""
+    return test_pet_state_management()
 
 if __name__ == "__main__":
     sys.exit(main())
