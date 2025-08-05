@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Integrate the second tool 'La méthode SMART' into the platform. The HTML content for this tool has been provided by the user."
+user_problem_statement: "Integrate the 'PIXEL-IA Buddy' digital pet tool with per-user evolution and saving functionality. The tool should maintain individual pet states linked to user authentication."
 
 backend:
   - task: "Integrate La méthode SMART tool"
