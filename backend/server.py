@@ -326,6 +326,88 @@ async def get_categories(current_user = Depends(get_current_user)):
     
     return categories
 
+@app.get("/api/pet-state", response_model=PetState)
+async def get_pet_state(current_user = Depends(get_current_user)):
+    """Get the user's pet state, create default if none exists"""
+    pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]})
+    
+    if not pet_state:
+        # Create default pet state for new user
+        pet_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc)
+        
+        default_pet = {
+            "id": pet_id,
+            "user_id": current_user["id"],
+            "name": "PIXEL-IA",
+            "level": 1,
+            "happiness": 80,
+            "knowledge": 60,
+            "energy": 75,
+            "hunger": 70,
+            "stage": "baby",
+            "modules_completed": 0,
+            "mood": "happy",
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        await pet_states_collection.insert_one(default_pet)
+        return PetState(**default_pet)
+    
+    return PetState(**pet_state)
+
+@app.post("/api/pet-state", response_model=PetState)
+async def save_pet_state(pet_data: PetStateCreate, current_user = Depends(get_current_user)):
+    """Save or update the user's pet state"""
+    now = datetime.now(timezone.utc)
+    existing_pet = await pet_states_collection.find_one({"user_id": current_user["id"]})
+    
+    if existing_pet:
+        # Update existing pet state
+        update_doc = {
+            "name": pet_data.name,
+            "level": pet_data.level,
+            "happiness": pet_data.happiness,
+            "knowledge": pet_data.knowledge,
+            "energy": pet_data.energy,
+            "hunger": pet_data.hunger,
+            "stage": pet_data.stage,
+            "modules_completed": pet_data.modules_completed,
+            "mood": pet_data.mood,
+            "updated_at": now
+        }
+        
+        await pet_states_collection.update_one(
+            {"user_id": current_user["id"]},
+            {"$set": update_doc}
+        )
+        
+        updated_pet = await pet_states_collection.find_one({"user_id": current_user["id"]})
+        return PetState(**updated_pet)
+    else:
+        # Create new pet state
+        pet_id = str(uuid.uuid4())
+        
+        pet_doc = {
+            "id": pet_id,
+            "user_id": current_user["id"],
+            "name": pet_data.name,
+            "level": pet_data.level,
+            "happiness": pet_data.happiness,
+            "knowledge": pet_data.knowledge,
+            "energy": pet_data.energy,
+            "hunger": pet_data.hunger,
+            "stage": pet_data.stage,
+            "modules_completed": pet_data.modules_completed,
+            "mood": pet_data.mood,
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        await pet_states_collection.insert_one(pet_doc)
+        return PetState(**pet_doc)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
