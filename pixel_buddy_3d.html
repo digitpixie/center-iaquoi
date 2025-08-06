@@ -937,9 +937,14 @@
                 const testCube = new THREE.Mesh(testGeometry, testMaterial);
                 scene.add(testCube);
 
-                // Éclairage basique
+                // Éclairage basique (UNE SEULE FOIS)
                 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
                 scene.add(ambientLight);
+
+                const pointLight = new THREE.PointLight(0xffb347, 1.2, 100);
+                pointLight.position.set(2, 4, 3);
+                pointLight.castShadow = true;
+                scene.add(pointLight);
 
                 console.log('✅ Cube de test ajouté');
 
