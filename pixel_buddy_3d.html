@@ -243,19 +243,31 @@
             transform: rotate(-45deg);
         }
 
-        /* Container 3D */
+        /* Container 3D - FORCER L'AFFICHAGE */
         .pet-container-3d {
             position: relative;
             margin-top: 50px;
             width: 200px;
             height: 200px;
+            background: rgba(255, 179, 71, 0.1) !important; /* Background visible pour debug */
+            border-radius: 20px;
+            border: 2px solid rgba(255, 179, 71, 0.3); /* Border visible */
         }
 
         #pet-canvas-3d {
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             border-radius: 20px;
-            background: radial-gradient(circle, rgba(255, 179, 71, 0.15), rgba(255, 105, 180, 0.1), rgba(221, 160, 221, 0.05));
+            background: radial-gradient(circle, rgba(255, 179, 71, 0.15), rgba(255, 105, 180, 0.1), rgba(221, 160, 221, 0.05)) !important;
+            display: block !important; /* Force l'affichage */
+            position: relative !important;
+            z-index: 1 !important;
+        }
+
+        #pet-canvas-3d canvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 20px;
         }
 
         /* Evolution Progress */
