@@ -90,7 +90,7 @@
             background: #000;
             border-radius: 2.5rem;
             height: min(600px, 80vh);
-            overflow: hidden;
+            overflow: visible !important; /* Permet aux boutons de dépasser */
             position: relative;
         }
 
@@ -99,6 +99,7 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            overflow: visible !important; /* Assure que les boutons ne sont pas coupés */
         }
 
         /* Header */
