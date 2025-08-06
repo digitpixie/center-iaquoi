@@ -343,19 +343,23 @@
             box-shadow: 0 0 10px #06b6d4;
         }
 
-        /* Action Buttons - CORRECTION VISIBILITÉ TOTALE */
+        /* Action Buttons - POSITION ABSOLUE POUR SORTIR DE L'ÉCRAN */
         .action-buttons {
             display: flex !important;
             justify-content: center;
             gap: 15px;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1) !important; /* Background plus visible */
+            background: rgba(255, 255, 255, 0.15) !important;
             border-radius: 1rem;
-            margin: 15px 0 0 0;
-            z-index: 1000 !important; /* Z-index très élevé */
-            position: relative !important;
-            border: 3px solid rgba(255, 179, 71, 0.8) !important; /* Bordure très visible */
-            min-height: 80px; /* Hauteur minimum garantie */
+            position: absolute !important; /* Position absolue */
+            bottom: -80px !important; /* Sort complètement de l'écran */
+            left: 50% !important;
+            transform: translateX(-50%) !important; /* Centre horizontalement */
+            z-index: 2000 !important;
+            border: 3px solid rgba(255, 179, 71, 0.8) !important;
+            min-height: 80px;
+            width: 280px; /* Largeur fixe */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important; /* Ombre pour visibilité */
         }
 
         .action-btn {
