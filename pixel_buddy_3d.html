@@ -1021,20 +1021,6 @@
 
             scene.add(petGroup);
 
-            // Éclairage chaleureux
-            const ambientLight = new THREE.AmbientLight(0xffeaa7, 0.6);
-            scene.add(ambientLight);
-
-            const pointLight = new THREE.PointLight(0xffb347, 1.2, 100);
-            pointLight.position.set(2, 4, 3);
-            pointLight.castShadow = true;
-            scene.add(pointLight);
-
-            // Lumière d'appoint rose
-            const pinkLight = new THREE.PointLight(0xff69b4, 0.8, 50);
-            pinkLight.position.set(-2, 2, 2);
-            scene.add(pinkLight);
-
             // Particules autour du pet
             createParticleSystem();
 
