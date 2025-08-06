@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXEL-IA Buddy Simple - Tamagotchi Digital</title>
+</head>
+<body>
+    <div id="pixel-buddy-wrapper">
+        <div id="ia-tamagotchi-root"></div>
+    </div>
+
+    <style>
+        /* Reset complet */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            overflow: hidden;
+        }
+        
+        /* Wrapper fullscreen */
+        #pixel-buddy-wrapper {
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a0a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #ia-tamagotchi-root {
+            font-family: monospace;
+            color: #fff;
+            width: 100%;
+            max-width: min(450px, 90vw);
+            margin: 0;
+            padding: 0;
+        }
+
+        .tamagotchi-device {
+            position: relative;
+            margin: 0;
+            width: 100%;
+        }
+
+        .device-inner {
+            background: transparent;
+            padding: 0;
+            position: relative;
+            width: min(420px, 90vw);
+            height: min(680px, 90vh);
+            margin: 0 auto;
+        }
+
+        .led-strip {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .led {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .led-cyan { background: #06b6d4; box-shadow: 0 0 8px #06b6d4; }
+        .led-purple { background: #a855f7; animation-delay: 0.1s; box-shadow: 0 0 8px #a855f7; }
+        .led-pink { background: #ec4899; animation-delay: 0.2s; box-shadow: 0 0 8px #ec4899; }
+
+        .screen {
+            background: #000;
+            border-radius: 2.5rem;
+            height: min(600px, 80vh);
+            overflow: visible !important;
+            position: relative;
+        }
+
+        .screen-content {
+            padding: 16px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: visible !important;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            margin-top: 20px;
+            z-index: 5;
+            position: relative;
+        }
+
+        .name-badge, .level-badge {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 9999px;
+            padding: 5px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .name-badge {
+            border: 1px solid rgba(255, 179, 71, 0.5);
+            color: #ffb347;
+            box-shadow: 0 0 10px rgba(255, 179, 71, 0.3);
+        }
+
+        .level-badge {
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            color: #ff69b4;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+        }
+
+        /* Stats */
+        .stats-container {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 179, 71, 0.2);
+            box-shadow: 0 0 15px rgba(255, 179, 71, 0.1);
+            z-index: 5;
+            position: relative;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-icon {
+            width: 14px;
+            height: 14px;
+            font-size: 14px;
+        }
+
+        .stat-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 9999px;
+        }
+
+        .stat-fill-pink { 
+            background: linear-gradient(to right, #ec4899, #f472b6); 
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+        }
+        .stat-fill-purple { 
+            background: linear-gradient(to right, #a855f7, #c084fc); 
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+        .stat-fill-yellow { 
+            background: linear-gradient(to right, #eab308, #facc15); 
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+        }
+        .stat-fill-cyan { 
+            background: linear-gradient(to right, #06b6d4, #22d3ee); 
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        .stat-value {
+            font-size: 12px;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        /* Pet Display CSS SIMPLE */
+        .pet-display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .thought-bubble {
+            position: absolute;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 179, 71, 0.5);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 13px;
+            color: #ffb347;
+            animation: pulse 2s infinite;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(255, 179, 71, 0.3);
+            z-index: 10;
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 18px;
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border-left: 1px solid rgba(255, 179, 71, 0.5);
+            border-bottom: 1px solid rgba(255, 179, 71, 0.5);
+            transform: rotate(-45deg);
+        }
+
+        /* BUDDY CSS 3D SIMPLE */
+        .pet-container {
+            position: relative;
+            margin-top: 50px;
+            width: 200px;
+            height: 200px;
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pet-buddy {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(145deg, #ffd1dc, #ffb6c1);
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+            animation: float 3s ease-in-out infinite, rotate3d 8s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        /* Yeux fermés adorables */
+        .pet-eyes {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .eye {
+            width: 20px;
+            height: 4px;
+            background: #000;
+            border-radius: 50px;
+            animation: blink 4s infinite;
+        }
+
+        /* Joues roses */
+        .pet-cheeks {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+        }
+
+        .cheek {
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, #ff69b4, #ff1493);
+            border-radius: 50%;
+            animation: blush 2s ease-in-out infinite;
+        }
+
+        /* Bouche souriante */
+        .pet-mouth {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 8px;
+            border: 2px solid #8b4513;
+            border-top: none;
+            border-radius: 0 0 50px 50px;
+        }
+
+        /* Oreilles */
+        .pet-ears {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 60px;
+        }
+
+        .ear {
+            width: 20px;
+            height: 30px;
+            background: linear-gradient(145deg, #ffb6c1, #dda0dd);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform: rotateZ(-20deg);
+            animation: wiggle 3s ease-in-out infinite;
+        }
+
+        .ear:last-child {
+            transform: rotateZ(20deg);
+            animation-delay: 1s;
+        }
+
+        /* Badge cœur */
+        .pet-badge {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #ff1493;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        /* Evolution Progress */
+        .evolution-container {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 10px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 179, 71, 0.2);
+            box-shadow: 0 0 15px rgba(255, 179, 71, 0.1);
+            z-index: 5;
+            position: relative;
+        }
+
+        .evolution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .evolution-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ffb347;
+            font-size: 13px;
+        }
+
+        .evolution-stage {
+            font-size: 11px;
+            color: #ff69b4;
+        }
+
+        .progress-bar {
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            height: 10px;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ffb347, #ff69b4, #ec4899);
+            transition: width 1s ease;
+            box-shadow: 0 0 15px rgba(255, 179, 71, 0.5);
+        }
+
+        .progress-nodes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 8px;
+        }
+
+        .progress-node {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .progress-node.active {
+            background: #ffb347;
+            box-shadow: 0 0 10px #ffb347;
+        }
+
+        /* Action Buttons - POSITION ABSOLUE */
+        .action-buttons {
+            display: flex !important;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-radius: 1rem;
+            position: absolute !important;
+            bottom: -80px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 2000 !important;
+            border: 3px solid rgba(255, 179, 71, 0.8) !important;
+            min-height: 80px;
+            width: 280px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .action-btn {
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.9) !important;
+            border: 4px solid transparent !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            transition: all 0.3s;
+            font-size: 28px !important;
+            backdrop-filter: blur(10px);
+            position: relative !important;
+            z-index: 1001 !important;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.15) translateY(-4px) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .action-btn-feed {
+            border-color: #ff6b35 !important;
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.8) !important;
+            background: rgba(255, 107, 53, 0.3) !important;
+            animation: pulse-orange 1.5s infinite !important;
+        }
+
+        .action-btn-play {
+            border-color: #ff69b4 !important;
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.8) !important;
+            background: rgba(255, 105, 180, 0.3) !important;
+            animation: pulse-pink 1.5s infinite 0.3s !important;
+        }
+
+        .action-btn-rest {
+            border-color: #dda0dd !important;
+            box-shadow: 0 0 25px rgba(221, 160, 221, 0.8) !important;
+            background: rgba(221, 160, 221, 0.3) !important;
+            animation: pulse-lavender 1.5s infinite 0.6s !important;
+        }
+
+        .action-btn-learn {
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.8) !important;
+            background: rgba(255, 215, 0, 0.3) !important;
+            animation: pulse-gold 1.5s infinite 0.9s !important;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateX(5deg); }
+            50% { transform: translateY(-10px) rotateX(-5deg); }
+        }
+
+        @keyframes rotate3d {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { height: 4px; }
+            95% { height: 1px; }
+        }
+
+        @keyframes blush {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.9); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotateZ(-20deg) rotateY(0deg); }
+            50% { transform: rotateZ(-25deg) rotateY(10deg); }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { 
+                box-shadow: 0 0 25px rgba(255, 107, 53, 0.8) !important;
+                transform: scale(1) !important;
+            }
+            50% { 
+                box-shadow: 0 0 35px rgba(255, 107, 53, 1) !important;
+                transform: scale(1.05) !important;
+            }
+        }
+
+        @keyframes pulse-pink {
+            0%, 100% { 
+                box-shadow: 0 0 25px rgba(255, 105, 180, 0.8) !important;
+                transform: scale(1) !important;
+            }
+            50% { 
+                box-shadow: 0 0 35px rgba(255, 105, 180, 1) !important;
+                transform: scale(1.05) !important;
+            }
+        }
+
+        @keyframes pulse-lavender {
+            0%, 100% { 
+                box-shadow: 0 0 25px rgba(221, 160, 221, 0.8) !important;
+                transform: scale(1) !important;
+            }
+            50% { 
+                box-shadow: 0 0 35px rgba(221, 160, 221, 1) !important;
+                transform: scale(1.05) !important;
+            }
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { 
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.8) !important;
+                transform: scale(1) !important;
+            }
+            50% { 
+                box-shadow: 0 0 35px rgba(255, 215, 0, 1) !important;
+                transform: scale(1.05) !important;
+            }
+        }
+
+        /* Messages */
+        .message-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ffb347;
+            border-radius: 12px;
+            padding: 14px 28px;
+            animation: pulse 0.5s;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(255, 179, 71, 0.5);
+        }
+
+        .message-text {
+            color: #ffb347;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        /* Help Button */
+        .help-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #ff69b4;
+            font-size: 22px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+            z-index: 10;
+        }
+
+        .help-button:hover {
+            border-color: #ff69b4;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
+            background: rgba(255, 105, 180, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .device-inner {
+                width: min(380px, 90vw);
+                height: min(620px, 90vh);
+            }
+
+            .screen {
+                height: min(540px, 80vh);
+            }
+            
+            .pet-container {
+                width: 180px;
+                height: 180px;
+            }
+
+            .pet-buddy {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .action-btn {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 22px !important;
+            }
+
+            .action-buttons {
+                gap: 10px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .device-inner {
+                width: min(320px, 90vw);
+                height: min(560px, 90vh);
+            }
+
+            .screen {
+                height: min(480px, 80vh);
+            }
+
+            .screen-content {
+                padding: 12px;
+            }
+
+            .header {
+                margin-top: 15px;
+            }
+
+            .name-badge, .level-badge {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+            
+            .pet-container {
+                width: 160px;
+                height: 160px;
+            }
+
+            .pet-buddy {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .action-btn {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 20px !important;
+            }
+
+            .action-buttons {
+                gap: 8px;
+                padding: 12px;
+                width: 250px;
+            }
+        }
+    </style>
+
+    <script>
+    (function() {
+        // Backend Integration - SIMPLE VERSION
+        const BACKEND_URL = window.location.origin;
+        let authToken = null;
+        let isLoading = false;
+        
+        function getAuthToken() {
+            try {
+                if (window.parent && window.parent.localStorage) {
+                    const token = window.parent.localStorage.getItem('token');
+                    if (token) {
+                        authToken = token;
+                        return token;
+                    }
+                }
+                
+                const token = localStorage.getItem('token');
+                if (token) {
+                    authToken = token;
+                    return token;
+                }
+            } catch (e) {
+                console.warn('Could not access storage:', e);
+            }
+            return null;
+        }
+
+        async function loadPetState() {
+            if (!authToken) return null;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/pet-state`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const petState = await response.json();
+                    return {
+                        name: petState.name,
+                        level: petState.level,
+                        happiness: petState.happiness,
+                        knowledge: petState.knowledge,
+                        energy: petState.energy,
+                        hunger: petState.hunger,
+                        stage: petState.stage,
+                        modulesCompleted: petState.modules_completed,
+                        mood: petState.mood
+                    };
+                }
+            } catch (error) {
+                console.warn('Error loading pet state:', error);
+            }
+            return null;
+        }
+
+        async function savePetState(petState) {
+            if (!authToken) return false;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/pet-state`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: petState.name,
+                        level: petState.level,
+                        happiness: petState.happiness,
+                        knowledge: petState.knowledge,
+                        energy: petState.energy,
+                        hunger: petState.hunger,
+                        stage: petState.stage,
+                        modules_completed: petState.modulesCompleted,
+                        mood: petState.mood
+                    })
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.warn('Error saving pet state:', error);
+                return false;
+            }
+        }
+
+        let pet = {
+            name: "PIXEL-IA",
+            level: 1,
+            happiness: 80,
+            knowledge: 60,
+            energy: 75,
+            hunger: 70,
+            stage: "baby",
+            modulesCompleted: 0,
+            currentAnimation: "idle",
+            thoughtBubble: "Bonjour.monde() 🌸",
+            mood: "happy"
+        };
+
+        let showMessage = false;
+        let messageText = "";
+
+        const thoughts = {
+            happy: ["Bonheur.exe() 🌸", "Joy.compile() 💖", "Sunshine.mode ✨", "< happy />"],
+            neutral: ["Processing...", "await update()", "System.ok()", "if(mood) {...}"],
+            sad: ["Need.hugs() 💙", "Low.energy()", "404: Joy not found", "Buffer.sad()"],
+            excited: ["LEVEL.UP()! 🚀", "Amazing.render() 🎨", "Epic.mode() 🌟", "MAX.JOY()"],
+            sleepy: ["Sleep.mode() 💤", "Zzz.process()", "Dream.state", "Cozy.time()"]
+        };
+
+        function showNotification(msg) {
+            messageText = msg;
+            showMessage = true;
+            render();
+            setTimeout(() => {
+                showMessage = false;
+                render();
+            }, 3000);
+        }
+
+        async function saveToBackend() {
+            if (authToken) {
+                await savePetState(pet);
+            }
+        }
+
+        function feedPet() {
+            if (pet.hunger >= 90) {
+                showNotification("Trop.plein() 💾");
+                return;
+            }
+            
+            pet.hunger = Math.min(100, pet.hunger + 30);
+            pet.energy = Math.min(100, pet.energy + 10);
+            pet.happiness = Math.min(100, pet.happiness + 5);
+            pet.thoughtBubble = "Yummy.data() 🍜";
+            render();
+            saveToBackend();
+        }
+
+        function playWithPet() {
+            if (pet.happiness >= 90) {
+                showNotification("Joy.overflow() 💜");
+                return;
+            }
+            
+            pet.happiness = Math.min(100, pet.happiness + 25);
+            pet.energy = Math.max(10, pet.energy - 10);
+            pet.thoughtBubble = "Fun.time() 🎮";
+            render();
+            saveToBackend();
+        }
+
+        function restPet() {
+            pet.energy = Math.min(100, pet.energy + 40);
+            pet.thoughtBubble = "Recharge.mode() ⚡";
+            render();
+            saveToBackend();
+        }
+
+        function teachPet() {
+            pet.knowledge = Math.min(100, pet.knowledge + 15);
+            pet.thoughtBubble = "Learning.new() 🧠";
+            render();
+            saveToBackend();
+        }
+
+        function render() {
+            const root = document.getElementById('ia-tamagotchi-root');
+            if (!root) return;
+
+            // Update mood
+            if (pet.happiness > 70 && pet.energy > 50) {
+                pet.mood = "happy";
+            } else if (pet.happiness < 30 || pet.energy < 30) {
+                pet.mood = "sad";
+            } else if (pet.energy < 20) {
+                pet.mood = "sleepy";
+            } else {
+                pet.mood = "neutral";
+            }
+
+            root.innerHTML = `
+                <div class="tamagotchi-device">
+                    <div class="device-inner">
+                        <div class="led-strip">
+                            <div class="led led-cyan"></div>
+                            <div class="led led-purple"></div>
+                            <div class="led led-pink"></div>
+                        </div>
+                        
+                        <div class="screen">
+                            <div class="screen-content">
+                                <div class="header">
+                                    <div class="name-badge">
+                                        <span>🌸</span>
+                                        <span>${pet.name}</span>
+                                    </div>
+                                    <div class="level-badge">
+                                        <span>NIV.${pet.level}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-container">
+                                    <div class="stats-grid">
+                                        <div class="stat-bar">
+                                            <span class="stat-icon">❤️</span>
+                                            <div class="stat-track">
+                                                <div class="stat-fill stat-fill-pink" style="width: ${pet.happiness}%"></div>
+                                            </div>
+                                            <span class="stat-value" style="color: #ec4899">${pet.happiness}%</span>
+                                        </div>
+                                        
+                                        <div class="stat-bar">
+                                            <span class="stat-icon">🧠</span>
+                                            <div class="stat-track">
+                                                <div class="stat-fill stat-fill-purple" style="width: ${pet.knowledge}%"></div>
+                                            </div>
+                                            <span class="stat-value" style="color: #a855f7">${pet.knowledge}%</span>
+                                        </div>
+                                        
+                                        <div class="stat-bar">
+                                            <span class="stat-icon">⚡</span>
+                                            <div class="stat-track">
+                                                <div class="stat-fill stat-fill-yellow" style="width: ${pet.energy}%"></div>
+                                            </div>
+                                            <span class="stat-value" style="color: #eab308">${pet.energy}%</span>
+                                        </div>
+                                        
+                                        <div class="stat-bar">
+                                            <span class="stat-icon">💾</span>
+                                            <div class="stat-track">
+                                                <div class="stat-fill stat-fill-cyan" style="width: ${pet.hunger}%"></div>
+                                            </div>
+                                            <span class="stat-value" style="color: #06b6d4">${pet.hunger}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="pet-display">
+                                    <div class="thought-bubble">
+                                        &gt; ${pet.thoughtBubble}
+                                    </div>
+                                    
+                                    <div class="pet-container">
+                                        <div class="pet-buddy">
+                                            <div class="pet-ears">
+                                                <div class="ear"></div>
+                                                <div class="ear"></div>
+                                            </div>
+                                            <div class="pet-eyes">
+                                                <div class="eye"></div>
+                                                <div class="eye"></div>
+                                            </div>
+                                            <div class="pet-cheeks">
+                                                <div class="cheek"></div>
+                                                <div class="cheek"></div>
+                                            </div>
+                                            <div class="pet-mouth"></div>
+                                            <div class="pet-badge">💖</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="evolution-container">
+                                    <div class="evolution-header">
+                                        <div class="evolution-title">
+                                            <span>🌸</span>
+                                            <span>KAWAII.STATE</span>
+                                        </div>
+                                        <span class="evolution-stage">CUTE_${pet.stage.toUpperCase()}</span>
+                                    </div>
+                                    
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${(pet.modulesCompleted / 6) * 100}%"></div>
+                                        <div class="progress-nodes">
+                                            ${[...Array(6)].map((_, i) => `
+                                                <div class="progress-node ${pet.modulesCompleted > i ? 'active' : ''}"></div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                                        <span style="color: #6b7280; font-size: 11px;">
+                                            MODULES [${pet.modulesCompleted}/6]
+                                        </span>
+                                        <span style="color: #ffb347; font-size: 11px;">
+                                            NEXT: ${6 - pet.modulesCompleted} modules
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                ${showMessage ? `
+                                    <div class="message-overlay">
+                                        <div class="message-text">${messageText}</div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons OUTSIDE SCREEN -->
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-feed" onclick="pixelSimple.feed()">
+                                <span>🍜</span>
+                            </button>
+                            <button class="action-btn action-btn-play" onclick="pixelSimple.play()">
+                                <span>🎮</span>
+                            </button>
+                            <button class="action-btn action-btn-rest" onclick="pixelSimple.rest()">
+                                <span>💤</span>
+                            </button>
+                            <button class="action-btn action-btn-learn" onclick="pixelSimple.teach()">
+                                <span>🧠</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="help-button">
+                    <span>❓</span>
+                </button>
+            `;
+        }
+
+        // Interface publique
+        window.pixelSimple = {
+            feed: feedPet,
+            play: playWithPet,
+            rest: restPet,
+            teach: teachPet
+        };
+
+        // Initialisation
+        async function initialize() {
+            authToken = getAuthToken();
+            console.log('🌸 PIXEL-IA Simple initialized');
+            console.log('Auth token:', authToken ? '✅' : '❌');
+            
+            if (authToken) {
+                const savedState = await loadPetState();
+                if (savedState) {
+                    Object.assign(pet, savedState);
+                    pet.thoughtBubble = "State.loaded() 💾";
+                }
+            }
+            
+            render();
+            
+            // Auto-update mood
+            setInterval(() => {
+                const moodThoughts = thoughts[pet.mood];
+                if (moodThoughts) {
+                    pet.thoughtBubble = moodThoughts[Math.floor(Math.random() * moodThoughts.length)];
+                }
+                render();
+            }, 5000);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+    })();
+    </script>
+</body>
+</html>
