@@ -449,7 +449,7 @@ async def save_pet_state(pet_data: PetStateCreate, current_user = Depends(get_cu
 async def get_skool_modules(current_user = Depends(get_current_user)):
     """Get all available Skool modules"""
     modules = []
-    cursor = skool_modules_collection.find().sort("created_at", 1)
+    cursor = skool_modules_collection.find({}, {"_id": 0}).sort("created_at", 1)
     async for module in cursor:
         modules.append(SkoolModule(**module))
     return modules
