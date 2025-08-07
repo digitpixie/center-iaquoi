@@ -245,6 +245,7 @@ frontend:
         - working: true
           agent: "main"
           comment: "UI successfully displays 6 Skool modules with proper navigation between Outils and Modules tabs. Progress cards show 0/6 modules completed, 0% progression, and PIXEL-IA Master Lv.6 status. All module cards visible with 'Compléter le module' buttons. Interface is responsive and follows the existing dark theme design."
+  - task: "Display tools in dashboard"
     implemented: true
     working: true
     file: "/app/frontend/src/App.js"
