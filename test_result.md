@@ -265,7 +265,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Frontend pet state integration"
+    - "PIXEL-IA Buddy code validation system"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
