@@ -585,7 +585,7 @@ async def get_skool_dashboard(current_user = Depends(get_current_user)):
     
     # Get user's completed modules
     completed_modules = []
-    cursor = skool_progress_collection.find({"user_id": current_user["id"]})
+    cursor = skool_progress_collection.find({"user_id": current_user["id"]}, {"_id": 0})
     completed_module_ids = []
     async for prog in cursor:
         completed_modules.append(prog)
@@ -593,12 +593,12 @@ async def get_skool_dashboard(current_user = Depends(get_current_user)):
     
     # Get available modules
     all_modules = []
-    cursor = skool_modules_collection.find().sort("created_at", 1)
+    cursor = skool_modules_collection.find({}, {"_id": 0}).sort("created_at", 1)
     async for module in cursor:
         all_modules.append(module)
     
     # Get current pet state
-    pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]})
+    pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]}, {"_id": 0})
     
     # Calculate progress statistics
     total_modules = len(all_modules)
