@@ -549,71 +549,70 @@ function App() {
           </div>
         )}
 
-        {/* Tools Grid (existing code) */}
-        {activeView === 'dashboard' && (
           <>
             {tools.length === 0 ? (
-          <div className="text-center py-16">
-            <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-400 mb-2">
-              Aucun outil pour le moment
-            </h3>
-            <p className="text-gray-500 mb-4">
-              Aucun outil disponible pour le moment
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {tools.map((tool) => (
-              <Card key={tool.id} className="tool-card group bg-gray-900 border-gray-800 overflow-hidden">
-                {tool.preview_image && (
-                  <div className="aspect-[5/3] overflow-hidden">
-                    <img
-                      src={tool.preview_image}
-                      alt={tool.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                
-                <div className="p-4 space-y-3">
-                  <div>
-                    <h3 className="font-semibold text-white text-sm line-clamp-2">
-                      {tool.title}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-xs text-gray-400 line-clamp-2">
-                    {tool.description}
-                  </p>
-                  
-                  <div className="flex flex-col space-y-2">
-                    <Button
-                      size="sm"
-                      onClick={() => openToolFullscreen(tool)}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 text-xs font-medium shadow-lg"
-                    >
-                      <Maximize2 className="w-3 h-3 mr-2" />
-                      ✨ Découvrir
-                    </Button>
-                    <div className="flex justify-center">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteTool(tool.id)}
-                        className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Supprimer
-                      </Button>
+              <div className="text-center py-16">
+                <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-400 mb-2">
+                  Aucun outil pour le moment
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  Aucun outil disponible pour le moment
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {tools.map((tool) => (
+                  <Card key={tool.id} className="tool-card group bg-gray-900 border-gray-800 overflow-hidden">
+                    {tool.preview_image && (
+                      <div className="aspect-[5/3] overflow-hidden">
+                        <img
+                          src={tool.preview_image}
+                          alt={tool.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="p-4 space-y-3">
+                      <div>
+                        <h3 className="font-semibold text-white text-sm line-clamp-2">
+                          {tool.title}
+                        </h3>
+                      </div>
+                      
+                      <p className="text-xs text-gray-400 line-clamp-2">
+                        {tool.description}
+                      </p>
+                      
+                      <div className="flex flex-col space-y-2">
+                        <Button
+                          size="sm"
+                          onClick={() => openToolFullscreen(tool)}
+                          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 text-xs font-medium shadow-lg"
+                        >
+                          <Maximize2 className="w-3 h-3 mr-2" />
+                          ✨ Découvrir
+                        </Button>
+                        <div className="flex justify-center">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeleteTool(tool.id)}
+                            className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            Supprimer
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
         )}
-      </main>
 
       {/* Edit Tool Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
