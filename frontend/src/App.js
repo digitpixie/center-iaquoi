@@ -449,8 +449,110 @@ function App() {
           </Alert>
         )}
 
-        {/* Tools Grid */}
-        {tools.length === 0 ? (
+        {/* Skool Modules View */}
+        {activeView === 'skool' && (
+          <div className="space-y-6">
+            {/* Progress Overview */}
+            {skoolDashboard && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <Card className="p-6 bg-gradient-to-br from-purple-900/50 to-purple-800/50 border-purple-700">
+                  <div className="flex items-center space-x-3">
+                    <Trophy className="w-8 h-8 text-yellow-400" />
+                    <div>
+                      <p className="text-sm text-purple-200">Modules Complétés</p>
+                      <p className="text-2xl font-bold text-white">
+                        {skoolDashboard.completed_modules}/{skoolDashboard.total_modules}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-6 bg-gradient-to-br from-blue-900/50 to-blue-800/50 border-blue-700">
+                  <div className="flex items-center space-x-3">
+                    <Target className="w-8 h-8 text-blue-400" />
+                    <div>
+                      <p className="text-sm text-blue-200">Progression</p>
+                      <p className="text-2xl font-bold text-white">
+                        {skoolDashboard.progress_percentage}%
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-6 bg-gradient-to-br from-green-900/50 to-green-800/50 border-green-700">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 text-2xl">🐾</div>
+                    <div>
+                      <p className="text-sm text-green-200">PIXEL-IA</p>
+                      <p className="text-2xl font-bold text-white capitalize">
+                        {skoolDashboard.pet_state?.stage || 'Baby'} Lv.{skoolDashboard.pet_state?.level || 1}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* Available Modules */}
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-4">Modules Disponibles</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {skoolModules.map((module) => (
+                  <Card key={module.id} className="bg-gray-900 border-gray-800 overflow-hidden">
+                    <div className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <h3 className="font-semibold text-white text-sm line-clamp-2">
+                          {module.title}
+                        </h3>
+                        {module.completed && (
+                          <Badge className="bg-green-500 text-white ml-2">
+                            ✓ Complété
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-xs text-gray-400 line-clamp-2">
+                        {module.description}
+                      </p>
+                      
+                      <div className="text-xs text-purple-400">
+                        Récompense: +{module.reward_points} points
+                      </div>
+                      
+                      {!module.completed && (
+                        <Button
+                          size="sm"
+                          onClick={() => setSelectedModule(module)}
+                          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+                        >
+                          Compléter le module
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+            
+            {/* No modules message */}
+            {skoolModules.length === 0 && (
+              <div className="text-center py-16">
+                <BookOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-400 mb-2">
+                  Aucun module disponible
+                </h3>
+                <p className="text-gray-500">
+                  Les modules Skool seront bientôt disponibles !
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tools Grid (existing code) */}
+        {activeView === 'dashboard' && (
+          <>
+            {tools.length === 0 ? (
           <div className="text-center py-16">
             <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-400 mb-2">
