@@ -534,7 +534,7 @@ async def complete_skool_module(progress_data: SkoolProgressCreate, current_user
     # Trigger PIXEL-IA evolution if required
     if module["required_for_evolution"]:
         # Get current pet state
-        pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]})
+        pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]}, {"_id": 0})
         
         if pet_state:
             # Calculate new stats based on module completion
