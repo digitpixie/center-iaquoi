@@ -390,6 +390,32 @@ function App() {
               <Wrench className="w-8 h-8 text-white" />
               <h1 className="text-xl font-bold text-white">IA QUOI</h1>
             </div>
+            <div className="hidden sm:flex items-center space-x-4">
+              <Button
+                onClick={() => setActiveView('dashboard')}
+                variant={activeView === 'dashboard' ? 'default' : 'outline'}
+                size="sm"
+                className={activeView === 'dashboard' ? 
+                  'bg-white text-black' : 
+                  'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                }
+              >
+                <Wrench className="w-4 h-4 mr-2" />
+                Outils
+              </Button>
+              <Button
+                onClick={() => setActiveView('skool')}
+                variant={activeView === 'skool' ? 'default' : 'outline'}
+                size="sm"
+                className={activeView === 'skool' ? 
+                  'bg-white text-black' : 
+                  'border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white'
+                }
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Modules
+              </Button>
+            </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-gray-300">
                 <User className="w-4 h-4" />
