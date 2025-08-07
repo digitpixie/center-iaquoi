@@ -16,6 +16,11 @@ function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tools, setTools] = useState([]);
+  const [activeView, setActiveView] = useState('dashboard'); // 'dashboard' or 'skool'
+  const [skoolDashboard, setSkoolDashboard] = useState(null);
+  const [skoolModules, setSkoolModules] = useState([]);
+  const [completionCode, setCompletionCode] = useState('');
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
