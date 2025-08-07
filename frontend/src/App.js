@@ -613,8 +613,54 @@ function App() {
             )}
           </>
         )}
+      </main>
 
-      {/* Edit Tool Dialog */}
+      {/* Module Completion Dialog */}
+      <Dialog open={selectedModule !== null} onOpenChange={() => setSelectedModule(null)}>
+        <DialogContent className="max-w-md bg-gray-900 border-gray-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Compléter le module</DialogTitle>
+          </DialogHeader>
+          {selectedModule && (
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-white mb-2">{selectedModule.title}</h3>
+                <p className="text-sm text-gray-400">{selectedModule.description}</p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="completion_code" className="text-gray-300">
+                  Code de complétion du module
+                </Label>
+                <Input
+                  id="completion_code"
+                  value={completionCode}
+                  onChange={(e) => setCompletionCode(e.target.value)}
+                  placeholder="Saisissez le code obtenu après complétion"
+                  className="bg-gray-800 border-gray-700 text-white"
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setSelectedModule(null)}
+                  className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  onClick={() => completeModule(selectedModule.id)}
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                >
+                  Valider
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-gray-900 border-gray-800 text-white">
           <DialogHeader>
