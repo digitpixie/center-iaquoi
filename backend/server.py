@@ -479,7 +479,7 @@ async def create_skool_module(module: SkoolModuleCreate, current_user = Depends(
 async def get_user_skool_progress(current_user = Depends(get_current_user)):
     """Get user's Skool progress"""
     progress = []
-    cursor = skool_progress_collection.find({"user_id": current_user["id"]}).sort("completed_at", -1)
+    cursor = skool_progress_collection.find({"user_id": current_user["id"]}, {"_id": 0}).sort("completed_at", -1)
     async for prog in cursor:
         progress.append(SkoolProgress(**prog))
     return progress
