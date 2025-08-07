@@ -272,7 +272,7 @@ test_plan:
 
 agent_communication:
     - agent: "main"
-      message: "Phase 1-3 Complete: Successfully integrated PIXEL-IA Buddy tool with per-user state management. Phase 1: Tool integrated via API (ID: a4b50aeb-2901-460f-87a1-727930b967cc). Phase 2: Backend endpoints implemented and tested (GET/POST /api/pet-state). Phase 3: Frontend integration complete with authentication token retrieval, state loading/saving, auto-save functionality. Pet state now persists per-user with automatic backend synchronization. Tool updated with backend integration. Ready for frontend testing to verify end-to-end user experience."
+      message: "User requests certification that PIXEL-IA Buddy code system works correctly. Need to test: 1) Module codes (START-GAME, POWER-UP, NEW-SKIN, PRESS-PLAY, GOD-MODE, GG-WP) trigger correct evolution 2) Pet levels change (1-6) 3) Pet stages evolve (baby→teen→adult→master) 4) Stats update correctly 5) Messages display properly. Critical verification needed before user gives access to students."
     - agent: "main"
       message: "Successfully integrated La méthode SMART tool via API. Tool created with ID adcffb0c-a0de-4c7a-af74-78e95609746b. Backend integration complete, ready for testing backend functionality and then frontend display."
     - agent: "testing"
