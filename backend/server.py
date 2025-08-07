@@ -444,6 +444,182 @@ async def save_pet_state(pet_data: PetStateCreate, current_user = Depends(get_cu
         await pet_states_collection.insert_one(pet_doc)
         return PetState(**pet_doc)
 
+# Skool Integration Endpoints
+@app.get("/api/skool/modules", response_model=List[SkoolModule])
+async def get_skool_modules(current_user = Depends(get_current_user)):
+    """Get all available Skool modules"""
+    modules = []
+    cursor = skool_modules_collection.find().sort("created_at", 1)
+    async for module in cursor:
+        modules.append(SkoolModule(**module))
+    return modules
+
+@app.post("/api/skool/modules", response_model=SkoolModule)
+async def create_skool_module(module: SkoolModuleCreate, current_user = Depends(get_current_user)):
+    """Create a new Skool module (admin function)"""
+    module_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc)
+    
+    module_doc = {
+        "id": module_id,
+        "title": module.title,
+        "description": module.description,
+        "skool_module_id": module.skool_module_id,
+        "completion_code": module.completion_code,
+        "reward_points": module.reward_points,
+        "required_for_evolution": module.required_for_evolution,
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await skool_modules_collection.insert_one(module_doc)
+    return SkoolModule(**module_doc)
+
+@app.get("/api/skool/progress", response_model=List[SkoolProgress])
+async def get_user_skool_progress(current_user = Depends(get_current_user)):
+    """Get user's Skool progress"""
+    progress = []
+    cursor = skool_progress_collection.find({"user_id": current_user["id"]}).sort("completed_at", -1)
+    async for prog in cursor:
+        progress.append(SkoolProgress(**prog))
+    return progress
+
+@app.post("/api/skool/progress", response_model=SkoolProgress)
+async def complete_skool_module(progress_data: SkoolProgressCreate, current_user = Depends(get_current_user)):
+    """Mark a Skool module as completed and trigger PIXEL-IA evolution"""
+    
+    # Check if module exists
+    module = await skool_modules_collection.find_one({"id": progress_data.module_id})
+    if not module:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Module not found"
+        )
+    
+    # Check if user already completed this module
+    existing_progress = await skool_progress_collection.find_one({
+        "user_id": current_user["id"],
+        "module_id": progress_data.module_id
+    })
+    if existing_progress:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Module already completed"
+        )
+    
+    # Verify completion code
+    if progress_data.completion_code.upper() != module["completion_code"].upper():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid completion code"
+        )
+    
+    # Create progress record
+    progress_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc)
+    
+    progress_doc = {
+        "id": progress_id,
+        "user_id": current_user["id"],
+        "module_id": progress_data.module_id,
+        "module_title": module["title"],
+        "completion_code": progress_data.completion_code,
+        "completed_at": now,
+        "notes": progress_data.notes,
+        "pet_evolution_triggered": False
+    }
+    
+    await skool_progress_collection.insert_one(progress_doc)
+    
+    # Trigger PIXEL-IA evolution if required
+    if module["required_for_evolution"]:
+        # Get current pet state
+        pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]})
+        
+        if pet_state:
+            # Calculate new stats based on module completion
+            new_level = pet_state["level"]
+            new_stage = pet_state["stage"]
+            new_modules_completed = pet_state["modules_completed"] + 1
+            new_knowledge = min(pet_state["knowledge"] + module["reward_points"], 100)
+            new_happiness = min(pet_state["happiness"] + 10, 100)
+            
+            # Evolution logic based on modules completed
+            if new_modules_completed >= 1 and pet_state["stage"] == "baby":
+                new_stage = "teen"
+                new_level = 2
+            elif new_modules_completed >= 3 and pet_state["stage"] == "teen":
+                new_stage = "adult"
+                new_level = 4
+            elif new_modules_completed >= 6 and pet_state["stage"] == "adult":
+                new_stage = "master"
+                new_level = 6
+            
+            # Update pet state
+            update_doc = {
+                "level": new_level,
+                "happiness": new_happiness,
+                "knowledge": new_knowledge,
+                "stage": new_stage,
+                "modules_completed": new_modules_completed,
+                "mood": "excited",  # Pet is excited about learning!
+                "updated_at": now
+            }
+            
+            await pet_states_collection.update_one(
+                {"user_id": current_user["id"]},
+                {"$set": update_doc}
+            )
+            
+            # Mark evolution as triggered
+            await skool_progress_collection.update_one(
+                {"id": progress_id},
+                {"$set": {"pet_evolution_triggered": True}}
+            )
+    
+    return SkoolProgress(**progress_doc)
+
+@app.get("/api/skool/dashboard")
+async def get_skool_dashboard(current_user = Depends(get_current_user)):
+    """Get Skool dashboard data including progress summary and available modules"""
+    
+    # Get user's completed modules
+    completed_modules = []
+    cursor = skool_progress_collection.find({"user_id": current_user["id"]})
+    completed_module_ids = []
+    async for prog in cursor:
+        completed_modules.append(prog)
+        completed_module_ids.append(prog["module_id"])
+    
+    # Get available modules
+    all_modules = []
+    cursor = skool_modules_collection.find().sort("created_at", 1)
+    async for module in cursor:
+        all_modules.append(module)
+    
+    # Get current pet state
+    pet_state = await pet_states_collection.find_one({"user_id": current_user["id"]})
+    
+    # Calculate progress statistics
+    total_modules = len(all_modules)
+    completed_count = len(completed_modules)
+    progress_percentage = (completed_count / total_modules * 100) if total_modules > 0 else 0
+    
+    return {
+        "total_modules": total_modules,
+        "completed_modules": completed_count,
+        "progress_percentage": round(progress_percentage, 1),
+        "available_modules": [
+            {
+                **module,
+                "completed": module["id"] in completed_module_ids
+            }
+            for module in all_modules
+        ],
+        "recent_completions": completed_modules[-5:] if completed_modules else [],
+        "pet_state": pet_state
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
