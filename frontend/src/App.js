@@ -44,8 +44,11 @@ function App() {
   useEffect(() => {
     if (user) {
       fetchTools();
+      if (activeView === 'skool') {
+        fetchSkoolDashboard();
+      }
     }
-  }, [user]);
+  }, [user, activeView]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
