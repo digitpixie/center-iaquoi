@@ -489,7 +489,7 @@ async def complete_skool_module(progress_data: SkoolProgressCreate, current_user
     """Mark a Skool module as completed and trigger PIXEL-IA evolution"""
     
     # Check if module exists
-    module = await skool_modules_collection.find_one({"id": progress_data.module_id})
+    module = await skool_modules_collection.find_one({"id": progress_data.module_id}, {"_id": 0})
     if not module:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
