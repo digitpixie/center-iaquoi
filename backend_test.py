@@ -871,9 +871,372 @@ def test_pixel_buddy_code_validation_system():
         print(f"\n❌ Some critical PIXEL-IA Buddy tests failed")
         return 1
 
+def test_skool_integration_endpoints():
+    """Test the new Skool integration backend endpoints"""
+    print("🚀 Testing Skool Integration Backend Endpoints")
+    print("=" * 60)
+    
+    # Setup
+    tester = OutilsInteractifsAPITester()
+    admin_email = "admin@digitpixie.com"
+    admin_password = "DigitPixie2025!"
+    
+    # Test 1: Health Check
+    print("\n1. Testing Health Check...")
+    if not tester.test_health_check()[0]:
+        print("❌ Health check failed, stopping tests")
+        return 1
+
+    # Test 2: Admin Login
+    print("\n2. Testing Admin Authentication...")
+    if not tester.test_login(admin_email, admin_password):
+        print("❌ Admin login failed, stopping tests")
+        return 1
+
+    # Test 3: Get Current User
+    print("\n3. Testing Get Current User...")
+    if not tester.test_get_current_user():
+        print("❌ Get current user failed")
+        return 1
+
+    # Test 4: GET /api/skool/modules - Should return 6 modules
+    print("\n4. Testing GET /api/skool/modules...")
+    success, modules_response = tester.run_test(
+        "Get Skool Modules",
+        "GET",
+        "api/skool/modules",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get Skool modules")
+        return 1
+    
+    # Verify modules structure and count
+    if not isinstance(modules_response, list):
+        print("❌ Modules response is not a list")
+        return 1
+    
+    expected_module_count = 6
+    actual_module_count = len(modules_response)
+    print(f"   Expected modules: {expected_module_count}")
+    print(f"   Actual modules: {actual_module_count}")
+    
+    if actual_module_count != expected_module_count:
+        print(f"❌ Incorrect number of modules - Expected: {expected_module_count}, Got: {actual_module_count}")
+        return 1
+    
+    print("✅ Correct number of modules found")
+    
+    # Verify module structure
+    required_fields = ['id', 'title', 'description', 'completion_code', 'reward_points']
+    modules_valid = True
+    first_module_id = None
+    first_module_code = None
+    
+    for i, module in enumerate(modules_response, 1):
+        print(f"   Module {i}: {module.get('title', 'Unknown')}")
+        print(f"     Completion Code: {module.get('completion_code', 'Missing')}")
+        print(f"     Reward Points: {module.get('reward_points', 'Missing')}")
+        
+        # Store first module for later testing
+        if i == 1:
+            first_module_id = module.get('id')
+            first_module_code = module.get('completion_code')
+        
+        # Check required fields
+        for field in required_fields:
+            if field not in module or not module[field]:
+                print(f"     ❌ Missing or empty field: {field}")
+                modules_valid = False
+            else:
+                print(f"     ✅ {field}: Present")
+    
+    if modules_valid:
+        print("✅ All modules have required fields")
+    else:
+        print("❌ Some modules missing required fields")
+        return 1
+
+    # Test 5: GET /api/skool/progress - Should return empty initially
+    print("\n5. Testing GET /api/skool/progress (Initial - Should be empty)...")
+    success, progress_response = tester.run_test(
+        "Get Initial Skool Progress",
+        "GET",
+        "api/skool/progress",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get Skool progress")
+        return 1
+    
+    if not isinstance(progress_response, list):
+        print("❌ Progress response is not a list")
+        return 1
+    
+    if len(progress_response) == 0:
+        print("✅ Initial progress is empty as expected")
+    else:
+        print(f"⚠️  Initial progress not empty - found {len(progress_response)} entries")
+        print("   This might be expected if user has previous progress")
+
+    # Test 6: GET /api/skool/dashboard - Should return dashboard data
+    print("\n6. Testing GET /api/skool/dashboard...")
+    success, dashboard_response = tester.run_test(
+        "Get Skool Dashboard",
+        "GET",
+        "api/skool/dashboard",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get Skool dashboard")
+        return 1
+    
+    # Verify dashboard structure
+    required_dashboard_fields = ['total_modules', 'completed_modules', 'progress_percentage', 'available_modules', 'pet_state']
+    dashboard_valid = True
+    
+    print("   Verifying dashboard structure:")
+    for field in required_dashboard_fields:
+        if field in dashboard_response:
+            print(f"   ✅ {field}: Present")
+            if field == 'total_modules':
+                total_modules = dashboard_response[field]
+                print(f"     Value: {total_modules}")
+                if total_modules != 6:
+                    print(f"     ❌ Expected 6 total modules, got {total_modules}")
+                    dashboard_valid = False
+            elif field == 'available_modules':
+                available_modules = dashboard_response[field]
+                if isinstance(available_modules, list):
+                    print(f"     Count: {len(available_modules)}")
+                else:
+                    print(f"     ❌ available_modules is not a list")
+                    dashboard_valid = False
+            elif field == 'pet_state':
+                pet_state = dashboard_response[field]
+                if pet_state and isinstance(pet_state, dict):
+                    print(f"     Pet Level: {pet_state.get('level', 'Unknown')}")
+                    print(f"     Pet Stage: {pet_state.get('stage', 'Unknown')}")
+                else:
+                    print(f"     ❌ pet_state is invalid")
+                    dashboard_valid = False
+        else:
+            print(f"   ❌ {field}: Missing")
+            dashboard_valid = False
+    
+    if dashboard_valid:
+        print("✅ Dashboard structure is valid")
+    else:
+        print("❌ Dashboard structure is invalid")
+        return 1
+
+    # Test 7: POST /api/skool/progress - Test with valid data
+    print("\n7. Testing POST /api/skool/progress (Valid completion)...")
+    if not first_module_id or not first_module_code:
+        print("❌ Cannot test module completion - missing first module data")
+        return 1
+    
+    valid_completion_data = {
+        "module_id": first_module_id,
+        "completion_code": first_module_code,
+        "notes": "Test completion via API testing"
+    }
+    
+    success, completion_response = tester.run_test(
+        "Complete Module (Valid)",
+        "POST",
+        "api/skool/progress",
+        200,
+        data=valid_completion_data
+    )
+    
+    if not success:
+        print("❌ Failed to complete module with valid data")
+        return 1
+    
+    # Verify completion response structure
+    required_completion_fields = ['id', 'user_id', 'module_id', 'module_title', 'completion_code', 'completed_at']
+    completion_valid = True
+    
+    print("   Verifying completion response:")
+    for field in required_completion_fields:
+        if field in completion_response:
+            print(f"   ✅ {field}: Present")
+        else:
+            print(f"   ❌ {field}: Missing")
+            completion_valid = False
+    
+    if completion_valid:
+        print("✅ Module completion successful with valid response structure")
+    else:
+        print("❌ Module completion response structure invalid")
+        return 1
+
+    # Test 8: Verify PIXEL-IA evolution after module completion
+    print("\n8. Testing PIXEL-IA Evolution after Module Completion...")
+    success, updated_pet_state = tester.test_get_pet_state()
+    
+    if not success:
+        print("❌ Failed to get updated pet state")
+        return 1
+    
+    # Check if pet stats were updated
+    expected_updates = {
+        'modules_completed': 1,  # Should be at least 1 now
+        'knowledge': lambda x: x >= 90,  # Should have increased by 30 (60 + 30)
+        'happiness': lambda x: x >= 90,  # Should have increased by 10 (80 + 10)
+    }
+    
+    evolution_correct = True
+    print("   Verifying pet evolution:")
+    
+    for field, expected in expected_updates.items():
+        actual_value = updated_pet_state.get(field, 0)
+        if callable(expected):
+            is_correct = expected(actual_value)
+            print(f"   {field}: {'✅' if is_correct else '❌'} (Got: {actual_value})")
+        else:
+            is_correct = actual_value >= expected
+            print(f"   {field}: {'✅' if is_correct else '❌'} (Expected: >={expected}, Got: {actual_value})")
+        
+        evolution_correct = evolution_correct and is_correct
+    
+    if evolution_correct:
+        print("✅ PIXEL-IA evolution triggered successfully")
+    else:
+        print("❌ PIXEL-IA evolution not working correctly")
+
+    # Test 9: POST /api/skool/progress - Test with invalid completion code
+    print("\n9. Testing POST /api/skool/progress (Invalid completion code)...")
+    invalid_completion_data = {
+        "module_id": first_module_id,
+        "completion_code": "WRONG-CODE",
+        "notes": "Test with invalid code"
+    }
+    
+    success, error_response = tester.run_test(
+        "Complete Module (Invalid Code)",
+        "POST",
+        "api/skool/progress",
+        400,  # Should return 400 for invalid code
+        data=invalid_completion_data
+    )
+    
+    if success:
+        print("✅ Invalid completion code properly rejected with 400 error")
+    else:
+        print("❌ Invalid completion code handling failed")
+
+    # Test 10: POST /api/skool/progress - Test with missing module
+    print("\n10. Testing POST /api/skool/progress (Missing module)...")
+    missing_module_data = {
+        "module_id": "invalid-id",
+        "completion_code": first_module_code,
+        "notes": "Test with invalid module ID"
+    }
+    
+    success, error_response = tester.run_test(
+        "Complete Module (Missing Module)",
+        "POST",
+        "api/skool/progress",
+        404,  # Should return 404 for missing module
+        data=missing_module_data
+    )
+    
+    if success:
+        print("✅ Missing module properly rejected with 404 error")
+    else:
+        print("❌ Missing module handling failed")
+
+    # Test 11: GET /api/skool/progress - Should now show completed module
+    print("\n11. Testing GET /api/skool/progress (After completion)...")
+    success, updated_progress_response = tester.run_test(
+        "Get Updated Skool Progress",
+        "GET",
+        "api/skool/progress",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get updated Skool progress")
+        return 1
+    
+    if isinstance(updated_progress_response, list) and len(updated_progress_response) > 0:
+        print(f"✅ Progress updated - found {len(updated_progress_response)} completed module(s)")
+        
+        # Verify first completion entry
+        first_completion = updated_progress_response[0]
+        print(f"   Completed Module: {first_completion.get('module_title', 'Unknown')}")
+        print(f"   Completion Code: {first_completion.get('completion_code', 'Unknown')}")
+        print(f"   Completed At: {first_completion.get('completed_at', 'Unknown')}")
+    else:
+        print("❌ Progress not updated after module completion")
+
+    # Test 12: GET /api/skool/dashboard - Verify updated dashboard
+    print("\n12. Testing GET /api/skool/dashboard (After completion)...")
+    success, updated_dashboard_response = tester.run_test(
+        "Get Updated Skool Dashboard",
+        "GET",
+        "api/skool/dashboard",
+        200
+    )
+    
+    if not success:
+        print("❌ Failed to get updated Skool dashboard")
+        return 1
+    
+    # Verify dashboard shows updated progress
+    completed_modules = updated_dashboard_response.get('completed_modules', 0)
+    progress_percentage = updated_dashboard_response.get('progress_percentage', 0)
+    
+    print(f"   Completed Modules: {completed_modules}")
+    print(f"   Progress Percentage: {progress_percentage}%")
+    
+    if completed_modules >= 1:
+        print("✅ Dashboard shows updated completion count")
+    else:
+        print("❌ Dashboard not showing updated completion count")
+    
+    if progress_percentage > 0:
+        print("✅ Dashboard shows updated progress percentage")
+    else:
+        print("❌ Dashboard not showing updated progress percentage")
+
+    # Print final results
+    print("\n" + "=" * 60)
+    print(f"📊 Tests completed: {tester.tests_passed}/{tester.tests_run}")
+    
+    # Summary of critical findings
+    print("\n🔍 Skool Integration Summary:")
+    print(f"   Authentication: {'✅ Working' if tester.token else '❌ Failed'}")
+    print(f"   Module retrieval: {'✅ 6 modules found' if actual_module_count == 6 else '❌ Incorrect module count'}")
+    print(f"   Dashboard data: {'✅ Complete structure' if dashboard_valid else '❌ Missing fields'}")
+    print(f"   Module completion: {'✅ Working' if completion_valid else '❌ Failed'}")
+    print(f"   PIXEL-IA evolution: {'✅ Triggered' if evolution_correct else '❌ Not working'}")
+    print(f"   Error handling: {'✅ Working' if tester.tests_passed > 8 else '❌ Issues detected'}")
+    
+    # Determine overall success
+    critical_tests_passed = (
+        actual_module_count == 6 and 
+        dashboard_valid and 
+        completion_valid and 
+        evolution_correct
+    )
+    
+    if critical_tests_passed:
+        print("\n🎉 All critical Skool integration tests passed!")
+        print("🚀 Skool integration ready for production use!")
+        return 0
+    else:
+        print(f"\n❌ Some critical Skool integration tests failed")
+        return 1
+
 def main():
-    """Main test function - runs PIXEL-IA Buddy code validation system tests"""
-    return test_pixel_buddy_code_validation_system()
+    """Main test function - runs Skool integration tests"""
+    return test_skool_integration_endpoints()
 
 if __name__ == "__main__":
     sys.exit(main())
