@@ -108,6 +108,40 @@ class PetState(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+class SkoolModuleCreate(BaseModel):
+    title: str
+    description: str
+    skool_module_id: str
+    completion_code: str
+    reward_points: int = 30
+    required_for_evolution: bool = True
+
+class SkoolModule(BaseModel):
+    id: str
+    title: str
+    description: str
+    skool_module_id: str
+    completion_code: str
+    reward_points: int
+    required_for_evolution: bool
+    created_at: datetime
+    updated_at: datetime
+
+class SkoolProgressCreate(BaseModel):
+    module_id: str
+    completion_code: str
+    notes: Optional[str] = None
+
+class SkoolProgress(BaseModel):
+    id: str
+    user_id: str
+    module_id: str
+    module_title: str
+    completion_code: str
+    completed_at: datetime
+    notes: Optional[str] = None
+    pet_evolution_triggered: bool = False
+
 # Helper functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
