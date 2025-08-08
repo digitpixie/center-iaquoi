@@ -340,7 +340,9 @@ function App() {
         {/* Tools Grid */}
         {tools.length === 0 ? (
           <div className="text-center py-16">
-            <Wrench className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
+              <span className="text-2xl">🎯</span>
+            </div>
             <h3 className="text-lg font-medium text-gray-400 mb-2">
               Aucun outil pour le moment
             </h3>
