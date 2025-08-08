@@ -272,8 +272,10 @@ async def get_tools(current_user = Depends(get_current_user)):
             return 4
         elif "pixel" in title:
             return 5
+        elif "promptiq" in title:
+            return 6
         else:
-            return 6  # Other tools at the end
+            return 7  # Other tools at the end
     
     # Sort tools according to the custom order
     tools.sort(key=get_tool_order)
