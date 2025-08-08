@@ -7,7 +7,7 @@ import { Badge } from './components/ui/badge.jsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Textarea } from './components/ui/textarea';
 import { Alert, AlertDescription } from './components/ui/alert';
-import { ArrowLeft, User, LogOut, Maximize2, Wrench } from 'lucide-react';
+import { ArrowLeft, User, LogOut, Maximize2 } from 'lucide-react';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
