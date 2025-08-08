@@ -352,35 +352,25 @@ function App() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {tools.map((tool) => (
-              <Card key={tool.id} className="tool-card group bg-gray-900 border-gray-800 overflow-hidden">
-                {tool.preview_image && (
-                  <div className="aspect-[5/3] overflow-hidden">
-                    <img
-                      src={tool.preview_image}
-                      alt={tool.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                
-                <div className="p-4 space-y-3">
+              <Card key={tool.id} className="tool-card group glass-card overflow-hidden">
+                <div className="p-6 space-y-4">
                   <div>
-                    <h3 className="font-semibold text-white text-sm line-clamp-2">
+                    <h3 className="font-semibold text-white text-base line-clamp-2 mb-2">
                       {tool.title}
                     </h3>
                   </div>
                   
-                  <p className="text-xs text-gray-400 line-clamp-2">
+                  <p className="text-sm text-gray-300 line-clamp-3 leading-relaxed">
                     {tool.description}
                   </p>
                   
-                  <div className="flex flex-col space-y-2">
+                  <div className="flex flex-col space-y-3 pt-2">
                     <Button
                       size="sm"
                       onClick={() => openToolFullscreen(tool)}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 text-xs font-medium shadow-lg"
+                      className="w-full glass-button text-white font-medium shadow-lg transform transition-all duration-300 hover:scale-105"
                     >
-                      <Maximize2 className="w-3 h-3 mr-2" />
+                      <Maximize2 className="w-4 h-4 mr-2" />
                       ✨ Découvrir
                     </Button>
                   </div>
