@@ -156,27 +156,6 @@ function App() {
     }
   };
 
-  const handleDeleteTool = async (toolId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet outil?')) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/tools/${toolId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.ok) {
-        setSuccess('Outil supprimé!');
-        fetchTools();
-      } else {
-        setError('Erreur lors de la suppression');
-      }
-    } catch (error) {
-      setError('Erreur de connexion au serveur');
-    }
-  };
-
   const openEditDialog = (tool) => {
     setEditingTool(tool);
     setToolFormData({
