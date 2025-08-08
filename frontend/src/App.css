@@ -78,6 +78,16 @@ body {
   transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1) !important;
   position: relative;
   overflow: hidden;
+  min-height: 280px; /* Hauteur minimale pour alignement */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.glass-card .p-6 {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  justify-content: space-between !important;
 }
 
 .glass-card::before {
