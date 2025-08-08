@@ -78,56 +78,6 @@ function App() {
     }
   };
 
-  const fetchSkoolDashboard = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/skool/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.ok) {
-        const dashboardData = await response.json();
-        setSkoolDashboard(dashboardData);
-        setSkoolModules(dashboardData.available_modules);
-      }
-    } catch (error) {
-      console.error('Failed to fetch Skool dashboard:', error);
-    }
-  };
-
-  const completeModule = async (moduleId) => {
-    if (!completionCode.trim()) {
-      setError('Veuillez saisir le code de complétion');
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/skool/progress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          module_id: moduleId,
-          completion_code: completionCode
-        })
-      });
-
-      if (response.ok) {
-        setSuccess('Module complété ! Votre PIXEL-IA a évolué ! 🎉');
-        setCompletionCode('');
-        setSelectedModule(null);
-        fetchSkoolDashboard();
-      } else {
-        const data = await response.json();
-        setError(data.detail || 'Erreur lors de la complétion du module');
-      }
-    } catch (error) {
-      setError('Erreur de connexion au serveur');
-    }
-  };
-
 
 
   const handleAuth = async (e) => {
