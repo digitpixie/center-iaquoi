@@ -245,7 +245,7 @@ async def get_current_user_info(current_user = Depends(get_current_user)):
 @app.get("/api/tools", response_model=List[Tool])
 async def get_tools(current_user = Depends(get_current_user)):
     tools = []
-    cursor = tools_collection.find({"user_id": current_user["id"]}).sort("created_at", -1)
+    cursor = tools_collection.find({"user_id": current_user["id"]})
     async for tool in cursor:
         tools.append(Tool(
             id=tool["id"],
@@ -258,6 +258,26 @@ async def get_tools(current_user = Depends(get_current_user)):
             created_at=tool["created_at"],
             updated_at=tool["updated_at"]
         ))
+    
+    # Custom sorting order
+    def get_tool_order(tool):
+        title = tool.title.lower()
+        if "diagnostic" in title:
+            return 1
+        elif "smart" in title:
+            return 2
+        elif "3 cerveaux" in title or "cerveaux" in title:
+            return 3
+        elif "avatar" in title:
+            return 4
+        elif "pixel" in title:
+            return 5
+        else:
+            return 6  # Other tools at the end
+    
+    # Sort tools according to the custom order
+    tools.sort(key=get_tool_order)
+    
     return tools
 
 @app.post("/api/tools", response_model=Tool)
