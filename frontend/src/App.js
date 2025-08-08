@@ -404,17 +404,6 @@ function App() {
                       <Maximize2 className="w-3 h-3 mr-2" />
                       ✨ Découvrir
                     </Button>
-                    <div className="flex justify-center">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteTool(tool.id)}
-                        className="border-red-800 text-red-400 hover:bg-red-900/20 text-xs"
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Supprimer
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </Card>
