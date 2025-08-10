@@ -10,7 +10,11 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { ArrowLeft, User, LogOut, Maximize2 } from 'lucide-react';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const API_URL = process.env.REACT_APP_BACKEND_URL || (
+  window.location.hostname.includes('localhost') 
+    ? 'http://localhost:8001' 
+    : 'https://491c0e54-90d7-46ea-98ce-547d638aba2d.preview.emergentagent.com'
+);
 
 function App() {
   const [user, setUser] = useState(null);
