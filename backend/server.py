@@ -307,11 +307,8 @@ async def create_tool(tool: ToolCreate, current_user = Depends(get_current_user)
 
 @app.get("/api/tools/{tool_id}", response_model=Tool)
 async def get_tool(tool_id: str, current_user = Depends(get_current_user)):
-    tool = await tools_collection.find_one({
-        "id": tool_id,
-        "user_id": current_user["id"]
-    })
-    
+    """Get a specific tool by ID - accessible to all authenticated users"""
+    tool = await tools_collection.find_one({"id": tool_id})
     if not tool:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
