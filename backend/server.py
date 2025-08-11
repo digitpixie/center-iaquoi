@@ -244,8 +244,10 @@ async def get_current_user_info(current_user = Depends(get_current_user)):
 
 @app.get("/api/tools", response_model=List[Tool])
 async def get_tools(current_user = Depends(get_current_user)):
+    """Get all available tools for authenticated users"""
     tools = []
-    cursor = tools_collection.find({"user_id": current_user["id"]})
+    # Remove user_id filter to make tools accessible to all authenticated users
+    cursor = tools_collection.find({})
     async for tool in cursor:
         tools.append(Tool(
             id=tool["id"],
