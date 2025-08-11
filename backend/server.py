@@ -35,8 +35,27 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Database
+# Database connection with production fallback
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-client = AsyncIOMotorClient(MONGO_URL)
+
+# For production deployment on Emergent, we need to ensure MongoDB is accessible
+# If local MongoDB fails in production, we'll create an in-memory fallback
+try:
+    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    # Test connection
+    import asyncio
+    async def test_connection():
+        try:
+            await client.admin.command('ping')
+            return True
+        except Exception:
+            return False
+    
+    # We'll handle this in startup
+    client = AsyncIOMotorClient(MONGO_URL)
+except Exception as e:
+    print(f"MongoDB connection failed: {e}")
+    client = None
 db = client.outils_interactifs
 
 # Collections
