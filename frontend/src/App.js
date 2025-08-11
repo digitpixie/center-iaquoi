@@ -344,39 +344,39 @@ function App() {
 
         {/* Tools Grid */}
         {tools.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
-              <span className="text-2xl">🎯</span>
+          <div className="text-center py-12 sm:py-16">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
+              <span className="text-xl sm:text-2xl">🎯</span>
             </div>
-            <h3 className="text-lg font-medium text-gray-400 mb-2">
+            <h3 className="text-base sm:text-lg font-medium text-gray-400 mb-2">
               Aucun outil pour le moment
             </h3>
-            <p className="text-gray-500 mb-4">
+            <p className="text-sm sm:text-base text-gray-500 mb-4">
               Aucun outil disponible pour le moment
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
             {tools.map((tool) => (
               <Card key={tool.id} className="tool-card group glass-card overflow-hidden flex flex-col">
-                <div className="p-6 space-y-4 flex-1 flex flex-col">
+                <div className="p-4 sm:p-5 lg:p-6 space-y-3 sm:space-y-4 flex-1 flex flex-col">
                   <div>
-                    <h3 className="font-semibold text-white text-base line-clamp-2 mb-2">
+                    <h3 className="font-semibold text-white text-sm sm:text-base line-clamp-2 mb-1 sm:mb-2">
                       {tool.title}
                     </h3>
                   </div>
                   
-                  <p className="text-sm text-gray-300 line-clamp-3 leading-relaxed flex-1">
+                  <p className="text-xs sm:text-sm text-gray-300 line-clamp-3 leading-relaxed flex-1">
                     {tool.description}
                   </p>
                   
-                  <div className="flex flex-col space-y-3 pt-2 mt-auto">
+                  <div className="flex flex-col space-y-2 sm:space-y-3 pt-1 sm:pt-2 mt-auto">
                     <Button
                       size="sm"
                       onClick={() => openToolFullscreen(tool)}
-                      className="w-full glass-button text-white font-medium shadow-lg transform transition-all duration-300 hover:scale-105"
+                      className="w-full glass-button text-white font-medium shadow-lg transform transition-all duration-300 hover:scale-105 text-xs sm:text-sm py-2 sm:py-2.5"
                     >
-                      <Maximize2 className="w-4 h-4 mr-2" />
+                      <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                       ✨ Découvrir
                     </Button>
                   </div>
