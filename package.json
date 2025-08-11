@@ -1,0 +1,30 @@
+{
+  "name": "ia-quoi",
+  "version": "1.0.0",
+  "description": "Outils interactif IA",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && python server.py",
+    "dev:frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && python server.py"
+  },
+  "services": {
+    "backend": {
+      "build": "cd backend && pip install -r requirements.txt",
+      "start": "cd backend && python server.py",
+      "port": 8001,
+      "env": {
+        "MONGO_URL": "mongodb://localhost:27017"
+      }
+    },
+    "frontend": {
+      "build": "cd frontend && npm install && npm run build", 
+      "start": "cd frontend && npm start",
+      "port": 3000,
+      "env": {
+        "REACT_APP_BACKEND_URL": "https://ia-quoi.pixifai.fr"
+      }
+    }
+  }
+}
