@@ -13,7 +13,7 @@ import './App.css';
 const API_URL = process.env.REACT_APP_BACKEND_URL || (
   window.location.hostname === 'localhost' 
     ? 'http://localhost:8001' 
-    : window.location.origin
+    : `${window.location.protocol}//${window.location.host}`
 );
 
 function App() {
