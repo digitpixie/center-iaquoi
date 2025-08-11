@@ -301,23 +301,26 @@ function App() {
     <div className="min-h-screen bg-black">
       {/* Header */}
       <header className="bg-black/80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-xl font-bold text-white">IA QUOI</h1>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <h1 className="text-lg sm:text-xl font-bold text-white">IA QUOI</h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-gray-300">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="hidden sm:flex items-center space-x-2 text-gray-300">
                 <User className="w-4 h-4" />
-                <span className="hidden sm:block">{user.name}</span>
+                <span className="text-sm">{user.name}</span>
+              </div>
+              <div className="sm:hidden flex items-center">
+                <User className="w-4 h-4 text-gray-300" />
               </div>
               <Button
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2"
               >
-                <LogOut className="w-4 h-4 sm:mr-2" />
+                <LogOut className="w-3 h-3 sm:w-4 sm:h-4 mr-0 sm:mr-2" />
                 <span className="hidden sm:block">Déconnexion</span>
               </Button>
             </div>
@@ -326,7 +329,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
         {error && (
           <Alert className="mb-6 border-red-800 bg-red-900/20">
             <AlertDescription className="text-red-200">{error}</AlertDescription>
